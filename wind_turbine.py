@@ -11,20 +11,20 @@ T_INTER = [30, 300]
 
 GRID_START= 500
 GRID_CAP = 10000
-SIM_TIME = 1440            # Simulation time in seconds
+SIM_TIME = 60 * 60     # Simulation time in seconds
 
 class WindTurbine(object):
-    #Air density in kg/m3
+    # Air density in kg/m3
     p = 1.23
-    #Rotor swept area:
+    # Rotor swept area in m3:
     A = 12470
-    #Coefficient of performance:
+    # Coefficient of performance:
     Cp = 1      # ??
-    #Wind speed:
+    # Wind speed in m/s:
     V = 14
-    #Generator efficiency:
+    # Generator efficiency:
     Ng = 1      # ??
-    #Gear box bearing efficiency:
+    # Gear box bearing efficiency:
     Nb = 1      # ??
 
     def __init__(self, V):
@@ -40,17 +40,17 @@ def grid_controller(env, grid):
         grid_levels.append(grid.level)
         yield env.timeout(1)
 
-#How much energy is consumed
+# How much energy is consumed
 def consumer(env, grid):
     while True:
         power = random.randint(*CONSUMER_LEVEL)
         yield grid.get(power)
         yield env.timeout(1)
 
-#How much energy does the wind turbine deliver to the grid
+# How much energy does the wind turbine deliver to the grid
 def wind(env, grid):
     while True:
-        yield grid.put((WindTurbine(random.randint(*WIND_SPEED)).power())/100000)
+        yield grid.put((WindTurbine(random.randint(*WIND_SPEED)).power()) / 100000)
         yield env.timeout(1)
 
 # Simpy test...
@@ -67,14 +67,49 @@ env.run(until=SIM_TIME)
 
 # Plot results
 from matplotlib import pyplot as plt
-plt.plot(grid_levels, label="Grid levels")
-plt.xlabel("Time")
-plt.ylabel("Grid levels")
-plt.legend()
+import numpy as np
+
+# Draw plot
+fig, ax = plt.subplots(1, 1, figsize=(16, 9), dpi=80)
+ax.fill_between(np.arange(0, SIM_TIME), y1=grid_levels, y2=0, label="Power usage", alpha=0.5, color='tab:blue', linewidth=2)
+
+# Decorations
+ax.set_title('Simulation of Power Generated From Wind Turbines (Random Values)', fontsize=16)
+ax.set(ylim=[0, 10000])
+ax.set_xlabel(r'Time [minutes]')
+ax.set_ylabel(r'Grid levels')
+ax.legend(loc='best', fontsize=12)
+plt.xticks(np.arange(0, SIM_TIME + 1, 60), fontsize=10, horizontalalignment='center')
+ax.set_xticklabels(np.arange(0, 60 + 1))
+plt.xlim(0, 3600)
+
+# Draw tick lines
+for y in np.arange(0, 10000, 1000):
+    plt.hlines(y, xmin=0, xmax=len(np.arange(0, SIM_TIME)), colors='black', alpha=0.3, linestyles="--", lw=0.5)
+
+# Ligten borders
+plt.gca().spines["top"].set_alpha(0)
+plt.gca().spines["bottom"].set_alpha(.3)
+plt.gca().spines["right"].set_alpha(0)
+plt.gca().spines["left"].set_alpha(.3)
+
+# Show plot
+fig.tight_layout()
 plt.show()
+#plt.savefig('<name>', papertype='a4', format='pdf')   (uncomment to save plot)
 
-#wt1 = WindTurbine(14)
-#wt2 = WindTurbine(21)
 
-#print(wt1.power())
-#print(wt2.power())
+#ax.plot(grid_levels, label="Power usage")
+#ax.axis([0, 3600, 0, 10000])
+#ax.set_xticks(np.arange(0, SIM_TIME + 1, 60))
+#ax.set_xticklabels(np.arange(0, 60 + 1))
+#ax.set_xlabel(r'Time [minutes]')
+#ax.set_ylabel(r'Grid levels')
+
+
+#plt.plot(grid_levels, label="Grid levels")
+#plt.xlabel("Time [minutes]")
+#plt.ylabel("Grid levels")
+#plt.xticks(np.arange(1, SIM_TIME + 1, 60), np.arange(1, 60 + 1))
+#plt.legend()
+#plt.show()
