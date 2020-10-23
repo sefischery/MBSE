@@ -14,18 +14,24 @@ GRID_CAP = 10000
 SIM_TIME = 60 * 60     # Simulation time in seconds
 
 class WindTurbine(object):
+    #https://www.ajdesigner.com/phpwindpower/wind_generator_power_performance_coefficient.php
+    # Info about the below variables and their typical values
+
     # Air density in kg/m3
     p = 1.23
     # Rotor swept area in m3:
     A = 12470
     # Coefficient of performance:
-    Cp = 1      # ??
+    #Typical value is 0.35. The theoretical max is 0.56.
+    Cp = 0.35
     # Wind speed in m/s:
     V = 14
     # Generator efficiency:
-    Ng = 1      # ??
+    # Typically between 50 and 80 %
+    Ng = 0.65
     # Gear box bearing efficiency:
-    Nb = 1      # ??
+    # Typically 95 %
+    Nb = 0.95
 
     def __init__(self, V):
         self.V = V
@@ -75,7 +81,7 @@ ax.fill_between(np.arange(0, SIM_TIME), y1=grid_levels, y2=0, label="Power usage
 
 # Decorations
 ax.set_title('Simulation of Power Generated From Wind Turbines (Random Values)', fontsize=16)
-ax.set(ylim=[0, 10000])
+ax.set(ylim=[0, 3000])
 ax.set_xlabel(r'Time [minutes]')
 ax.set_ylabel(r'Grid levels')
 ax.legend(loc='best', fontsize=12)
