@@ -11,8 +11,15 @@ def gather_weather_json(start_datetime, end_datetime):
 
     #api_key = "3005becb7e874467b183c6d4158ad28b"
     api_key = "d3493c8dbeb448fbbe804c07a1b11a7b"
-    latitude = "55.784"
-    longitude = "12.519"
+    
+    #Lyngby
+    # latitude = "55.784"
+    # longitude = "12.519"
+    
+    #Aarhus
+    latitude = "56.157"
+    longitude = "10.201"
+
     frequency = "hourly"
 
 
@@ -37,12 +44,6 @@ def gather_weather_json(start_datetime, end_datetime):
 
     return jsonResponse
 
-    # for item in jsonResponse["data"]:
-    #     print("Time: " + str(item["timestamp_local"]))
-    #     print("wind: " + str(item["wind_spd"]))
-    #     print("solar radiation: " + str(item["solar_rad"]))
-    #     print("\n")
-
 start_datetime = datetime.datetime(2019, 1, 1)
 #dataframe = pd.read_csv("weather.csv", sep=';')
 dataframe = pd.DataFrame()
@@ -56,7 +57,9 @@ for i in range(365):
     start_datetime += datetime.timedelta(days=1)
     print(i)
 
-dataframe.to_csv('weather.csv', sep=';')
+
+
+dataframe.to_csv('weather_aarhus.csv', sep=';')
 
 
 
