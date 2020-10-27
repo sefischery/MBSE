@@ -15,7 +15,7 @@ class WeatherLog:
         return dt.strftime("%Y-%m-%dT%H:00:00")
 
 
-log = WeatherLog("weather.csv")
+log = WeatherLog("weather_copenhagen.csv")
 
 date = datetime.datetime(2019, 1, 1, 11)
 print(log.get_solar_rad(date))
