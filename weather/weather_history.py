@@ -15,8 +15,9 @@ class WeatherLog:
         return dt.strftime("%Y-%m-%dT%H:00:00")
 
 
-log = WeatherLog("weather_copenhagen.csv")
+# log = WeatherLog("weather_copenhagen.csv")
 
-date = datetime.datetime(2019, 1, 1, 11)
-print(log.get_solar_rad(date))
-print(log.get_wind_speed(date))
+# date = datetime.datetime(2019, 1, 1, 11)
+# print(log.get_solar_rad(date))
+# print(log.get_wind_speed(date))
+# print(type(log.get_solar_rad(date)))
