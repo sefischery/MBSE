@@ -18,6 +18,8 @@ GRID_CAP = 10000
 RANDOM_SEED = 42
 SIM_TIME = 60 * 60 * 24  # Time in seconds
 
+WING_SIZE = [20, 80]
+
 
 # SOLAR CELL
 class SolarCell(object):
@@ -27,7 +29,8 @@ class SolarCell(object):
         self.log = weather_history.WeatherLog("weather_copenhagen.csv")
 
     def power(self, datetime):
-        return self.log.get_solar_rad(datetime) * 0.2  # 20% efficiency
+        power = self.log.get_solar_rad(datetime) * 0.2 # 20% efficiency
+        return power
 
 
 # CONSUMER
@@ -63,7 +66,9 @@ class Consumer(object):
 
 # WIND TURBINE
 class WindTurbine(object):
-    WIND_SPEED = [1, 30]
+    def __init__(self, wing_size):
+        self.A = pow(wing_size, 2) * np.pi
+        self.log = weather_history.WeatherLog("weather_copenhagen.csv")
 
     # https://www.ajdesigner.com/phpwindpower/wind_generator_power_performance_coefficient.php
     # Info about the below variables and their typical values
@@ -71,12 +76,13 @@ class WindTurbine(object):
     # Air density in kg/m3
     p = 1.23
     # Rotor swept area in m3:
-    A = 12470
+    #A = wing_size * 2 * pow(numpy.pi, 2)
     # Coefficient of performance:
     # Typical value is 0.35. The theoretical max is 0.56.
     Cp = 0.35
     # Wind speed in m/s:
-    V = 14
+    #V = self.log.get_wind_speed(datetime)
+
     # Generator efficiency:
     # Typically between 50 and 80 %
     Ng = 0.65
@@ -84,10 +90,9 @@ class WindTurbine(object):
     # Typically 95 %
     Nb = 0.95
 
-    def power(self):
-        self.V = random.randint(*self.WIND_SPEED)
-        power = 0.5 * self.p * self.A * self.Cp * pow(self.V, 3) * self.Ng * self.Nb
-        return power / 100000
+    def power(self, datetime):
+        power = 0.5 * self.p * self.A * self.Cp * pow(self.log.get_wind_speed(datetime), 3) * self.Ng * self.Nb
+        return power / 10000
 
 
 grid_levels = []
@@ -128,9 +133,9 @@ wind_production = []
 
 
 def wind(env, grid):
-    windturbine = WindTurbine()
+    windturbine = WindTurbine(random.randint(*WING_SIZE))
     while True:
-        power = windturbine.power()
+        power = windturbine.power(datetime.datetime(2019, 1, 1, 11))
         wind_production.append(power)
         yield grid.put(power)
         yield env.timeout(1)
