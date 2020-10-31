@@ -1,11 +1,9 @@
 import datetime
-import simpy
 import numpy as np
 import random
 
 from DistributedStructure.SolarCell import SolarCell
 
-SIM_TIME = 24
 DAILY_USAGE = 4488  # Watt
 
 RegularConsumerHourly = [0.03303964757709271, 0.022026431718061677, 0.02026431718061674, 0.022026431718061675,
@@ -27,7 +25,7 @@ listOfConsumers_dict = {
 
 listOfConsumers = [RegularConsumerHourly, NightConsumerHourly, HomeConsumerHourly, HighUsageConsumerHourly]
 
-listOfResources = [None, SolarCell()]
+listOfResources = [None, SolarCell(10), SolarCell(20), SolarCell(60)]
 
 
 class Consumer(object):
@@ -40,7 +38,13 @@ class Consumer(object):
         # Dynamic variables
         self.consumedEnergy = 0
         self.generatedEnergy = 0
+
+        self.consumedEnergyTick = 0
+        self.generatedEnergyTick = 0
+
         self.resource = None
+
+        self.cityBatteryUsage = 0
 
         # Start processes
         env.process(self.ConsumeEnergy())
@@ -48,25 +52,39 @@ class Consumer(object):
 
     def ConsumeEnergy(self):
         while True:
-            typeList = listOfConsumers_dict.get(self.type)
             fluctuation = random.uniform(-0.0075, 0.0075)
-            energyConsumption = DAILY_USAGE * (typeList[env.now] + fluctuation)
+
+            typeList = listOfConsumers_dict.get(self.type)
+            energyConsumption = DAILY_USAGE * (typeList[self.env.now] + fluctuation)
+
             self.consumedEnergy += energyConsumption
-            yield consumerContainer.put(energyConsumption)
+            self.consumedEnergyTick = energyConsumption
             yield self.env.timeout(1)
 
     def GenerateResourceEnergy(self):
         if self.resource is not None:
             while True:
-                energy = self.resource.power(datetime.datetime(2019, 1, 1, 11)) * 2  # TODO: Make date variable
-                self.generatedEnergy += energy
-                yield env.timeout(1)
+                energyGenerated = self.resource.power(datetime.datetime(2019, 1, 1, self.env.now))
+                self.generatedEnergy += energyGenerated
+                self.generatedEnergyTick = energyGenerated
+                yield self.env.timeout(1)
 
     def SetResource(self, resource):
         self.resource = resource
 
-    def ProcessCityEnergy(self):
-        print()
+    def ProcessCityEnergyGrid(self, cityNumber, battery):
+        energy = self.generatedEnergyTick - self.consumedEnergyTick
+        if energy > 0:
+            battery.put(energy) # Give energy to city battery
+
+        elif energy < 0:
+            energy = abs(energy)
+            if energy > battery.level: # House will experience power outage
+                print(f"Power outage in city: {cityNumber}; house: {self.houseNumber}")
+
+            self.cityBatteryUsage += energy
+            battery.get(energy) # Take energy from city battery
+        yield self.env.timeout(1)
 
 
 def SelectRandomConsumerType():
@@ -75,23 +93,3 @@ def SelectRandomConsumerType():
 
 def SelectRandomResourceType():
     return random.choice(listOfResources)
-
-
-# Setup
-env = simpy.Environment()
-
-consumers = [Consumer(env, SelectRandomConsumerType(), i) for i in range(10)]
-
-# Initialize all consumers
-for consumer in consumers:
-    resource = SelectRandomResourceType()
-    consumer.SetResource(resource)
-
-# Create consumer contrainer
-consumerContainer = simpy.Container(env, 100000, init=0)
-
-# Execute!
-env.run(until=SIM_TIME)
-
-for consumer in consumers:
-    print(f"Consumertype: {consumer.type}, total energy consumed {consumer.consumedEnergy}, total energy generated: {consumer.generatedEnergy}")
