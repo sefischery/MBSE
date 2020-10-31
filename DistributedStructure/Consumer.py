@@ -25,7 +25,7 @@ listOfConsumers_dict = {
 
 listOfConsumers = [RegularConsumerHourly, NightConsumerHourly, HomeConsumerHourly, HighUsageConsumerHourly]
 
-listOfResources = [None, SolarCell(10), SolarCell(20), SolarCell(60)]
+listOfResources = [None, SolarCell(), SolarCell(), SolarCell()]
 
 
 class Consumer(object):
@@ -71,6 +71,10 @@ class Consumer(object):
 
     def SetResource(self, resource):
         self.resource = resource
+
+    def setResourceSize(self,size):
+        if self.resource is not None:
+            self.resource.setSquaremeterSize(size)
 
     def ProcessCityEnergyGrid(self, cityNumber, battery):
         energy = self.generatedEnergyTick - self.consumedEnergyTick
