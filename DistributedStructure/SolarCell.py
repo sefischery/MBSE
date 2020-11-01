@@ -1,6 +1,9 @@
 import random
-
+from pathlib import Path
 from weather import weather_history
+
+base_path = Path(__file__).parent
+file_path = (base_path / "../weather_copenhagen.csv").resolve()
 
 
 # SOLAR CELL
@@ -8,7 +11,7 @@ class SolarCell(object):
     SOLAR_OUTPUT_PER_SECOND = 137
 
     def __init__(self):
-        self.log = weather_history.WeatherLog("C:\\Users\\s164156\\Documents\\MBSE-master\\weather_copenhagen.csv")
+        self.log = weather_history.WeatherLog(file_path)
         self.squaremeters = 0
 
     def setSquaremeterSize(self, size):
