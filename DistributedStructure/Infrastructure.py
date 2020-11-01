@@ -1,5 +1,15 @@
 import pprint
+import random
 from collections import defaultdict
+
+from DistributedStructure.WindTurbine import WindTurbine
+from DistributedStructure.SolarCell import SolarCell
+
+# Constants
+WIND_TURBINES = 3
+SOLAR_CELLS = 4
+CONSUMERS = 10
+WING_SIZE = [20, 80]
 
 
 class Graph(object):
@@ -58,7 +68,12 @@ class Graph(object):
         return None
 
 
-connections = [('A', 'B'), ('B', 'C'), ('B', 'D'), ('C', 'D'), ('E', 'F'), ('F', 'C')]
+wind_turbines = [WindTurbine(i, random.randint(*WING_SIZE)) for i in range(WIND_TURBINES)]
+solar_cells = [SolarCell(i) for i in range(SOLAR_CELLS)]
+
+connections = [(wind_turbines[0], wind_turbines[1]), (wind_turbines[1], wind_turbines[2]),
+               (wind_turbines[1], solar_cells[0]), (solar_cells[0], solar_cells[1]),
+               (solar_cells[1], solar_cells[2]), (solar_cells[2], solar_cells[3]), ('B', 'C')]
 g = Graph(connections)
 pretty_print = pprint.PrettyPrinter()
 pretty_print.pprint(g._graph)

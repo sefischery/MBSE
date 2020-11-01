@@ -7,9 +7,13 @@ file_path = (base_path / "../weather_copenhagen.csv").resolve()
 
 
 class WindTurbine(object):
-    def __init__(self, wing_size):
+    def __init__(self, id, wing_size):
+        self.id = id
         self.A = pow(wing_size, 2) * np.pi
         self.log = weather_history.WeatherLog(file_path)
+
+    def __repr__(self):
+        return '{}({})'.format(self.__class__.__name__, self.id)
 
     # https://www.ajdesigner.com/phpwindpower/wind_generator_power_performance_coefficient.php
     # Info about the below variables and their typical values

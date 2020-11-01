@@ -10,9 +10,13 @@ file_path = (base_path / "../weather_copenhagen.csv").resolve()
 class SolarCell(object):
     SOLAR_OUTPUT_PER_SECOND = 137
 
-    def __init__(self):
+    def __init__(self, id):
+        self.id = id
         self.log = weather_history.WeatherLog(file_path)
         self.squaremeters = 0
+
+    def __repr__(self):
+        return '{}({})'.format(self.__class__.__name__, self.id)
 
     def setSquaremeterSize(self, size):
         self.squaremeters = size
