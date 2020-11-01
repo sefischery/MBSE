@@ -1,6 +1,5 @@
 import datetime
 import random
-
 import simpy
 
 from DistributedStructure.City import City
@@ -8,8 +7,8 @@ from DistributedStructure.Consumer import Consumer, SelectRandomConsumerType, Se
 from DistributedStructure.WindTurbine import WindTurbine
 
 SIM_TIME = 24
-NUMB_OF_CITIES = 3
-NUMB_OF_WINDTURBINES = 3
+NUMB_OF_CITIES = 4
+NUMB_OF_WINDTURBINES = 5
 
 WING_SIZE = [20, 80]
 
@@ -26,12 +25,23 @@ class EnergyGrid(object):
 
         # Start Grid processes
         env.process(self.GetGeneratedEnergy())
+        env.process(self.DistributeGeneratedEnergy())
+        env.process(self.OverwatchCities())
 
     def SetCities(self, cities):
         self.cities = cities
 
     def SetResources(self, resources):
         self.resources = resources
+
+    def OverwatchCities(self):
+        while True:
+            criticalCities = []
+            supportiveCities = []
+            for city in self.cities:
+                if city.battery.level / city.battery.capacity < 0.1:
+                    print(f"City number: {city.cityNumber} enter critical level")
+            yield self.env.timeout(1)
 
     def GetGeneratedEnergy(self):
         while True:
@@ -48,6 +58,7 @@ class EnergyGrid(object):
             for city in self.cities:
                 city.ProcessIncomingEnergy(energyLevelToDistribute)
             yield self.env.timeout(1)
+
 
 # Setup
 env = simpy.Environment()
@@ -74,14 +85,12 @@ for city in VirtualPowerGrid.cities:
         consumer.setResourceSize(random.randint(10, 70))  # set size of resource
         city.AddConsumer(consumer)
 
-    cityBatteryContainer = simpy.Container(env, len(city.consumerList) * 5000, init=(len(city.consumerList) * 5000) / 2)
+    batteryCapacity = len(city.consumerList) * 5000
+    cityBatteryContainer = simpy.Container(env, batteryCapacity, init=batteryCapacity/3)
     city.AddBattery(cityBatteryContainer)
 
 # Execute!
 env.run(until=SIM_TIME)
-
-# Printer for Grid
-print(f"Total energy generated to Grid: {VirtualPowerGrid.totalEnergyGenerated}")
 
 # Printer functionality
 for city in VirtualPowerGrid.cities:
@@ -95,3 +104,4 @@ for city in VirtualPowerGrid.cities:
               f"total energy used from battery: {consumer.cityBatteryUsage}")
     print(f"total city energy consumption: {cityConsumption}")
     print()
+print(f"Total windturbine energy generate: {VirtualPowerGrid.totalEnergyGenerated}")
