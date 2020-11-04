@@ -47,10 +47,10 @@ class Consumer(object):
         self.cityBatteryUsage = 0
 
         # Start processes
-        env.process(self.ConsumeEnergy())
-        env.process(self.GenerateResourceEnergy())
+        env.process(self.consume_energy())
+        env.process(self.generate_resource_energy())
 
-    def ConsumeEnergy(self):
+    def consume_energy(self):
         while True:
             fluctuation = random.uniform(-0.0075, 0.0075)
 
@@ -61,7 +61,7 @@ class Consumer(object):
             self.consumedEnergyTick = energyConsumption
             yield self.env.timeout(1)
 
-    def GenerateResourceEnergy(self):
+    def generate_resource_energy(self):
         if self.resource is not None:
             while True:
                 energyGenerated = self.resource.power(datetime.datetime(2019, 1, 1, self.env.now))
@@ -69,14 +69,14 @@ class Consumer(object):
                 self.generatedEnergyTick = energyGenerated
                 yield self.env.timeout(1)
 
-    def SetResource(self, resource):
+    def set_resource(self, resource):
         self.resource = resource
 
-    def setResourceSize(self,size):
+    def set_resource_size(self, size):
         if self.resource is not None:
-            self.resource.setSquaremeterSize(size)
+            self.resource.set_squaremeter_size(size)
 
-    def ProcessCityEnergyGrid(self, cityNumber, battery):
+    def process_city_energy_grid(self, cityNumber, battery):
         energy = self.generatedEnergyTick - self.consumedEnergyTick
         if energy > 0:
             battery.put(energy) # Give energy to city battery
@@ -91,9 +91,9 @@ class Consumer(object):
         yield self.env.timeout(1)
 
 
-def SelectRandomConsumerType():
+def select_random_consumer_type():
     return random.choice(list(listOfConsumers_dict.keys()))
 
 
-def SelectRandomResourceType():
+def select_random_resource_type():
     return random.choice(listOfResources)

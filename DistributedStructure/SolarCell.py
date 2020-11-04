@@ -17,7 +17,7 @@ class SolarCell(object):
     def __repr__(self):
         return '{}({})'.format(self.__class__.__name__, self.id)
 
-    def setSquaremeterSize(self, size):
+    def set_squaremeter_size(self, size):
         self.squaremeters = size
 
     def power(self, datetime):

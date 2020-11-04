@@ -9,20 +9,20 @@ class City(object):
         self.battery = None
 
         # Start process
-        env.process(self.OverwatchConsumer())
+        env.process(self.overwatch_consumer())
 
-    def AddBattery(self, battery):
+    def add_battery(self, battery):
         self.battery = battery
 
-    def AddConsumer(self, consumer):
+    def add_consumer(self, consumer):
         self.consumerList.append(consumer)
 
-    def OverwatchConsumer(self):
+    def overwatch_consumer(self):
         while True:
             for consumer in self.consumerList:
-                self.env.process(consumer.ProcessCityEnergyGrid(self.cityNumber, self.battery))
+                self.env.process(consumer.process_city_energy_grid(self.cityNumber, self.battery))
             yield self.env.timeout(1)
 
-    def ProcessIncomingEnergy(self, energy):
+    def process_incoming_energy(self, energy):
         self.battery.put(energy)
 
