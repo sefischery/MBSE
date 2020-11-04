@@ -19,7 +19,7 @@ class Graph(object):
         self._graph = defaultdict(set)
         self.add_connections(connections)
 
-    def __str__(self):
+    def __repr__(self):
         return '{}({})'.format(self.__class__.__name__, dict(self._graph))
 
     def add_connections(self, connections):
@@ -67,13 +67,16 @@ class Graph(object):
                     return new_path
         return None
 
-
 wind_turbines = [WindTurbine(i, random.randint(*WING_SIZE)) for i in range(WIND_TURBINES)]
 solar_cells = [SolarCell(i) for i in range(SOLAR_CELLS)]
 
+"""
 connections = [(wind_turbines[0], wind_turbines[1]), (wind_turbines[1], wind_turbines[2]),
                (wind_turbines[1], solar_cells[0]), (solar_cells[0], solar_cells[1]),
                (solar_cells[1], solar_cells[2]), (solar_cells[2], solar_cells[3]), ('B', 'C')]
-g = Graph(connections)
+copenhagen = Graph(connections)
+aarhus = Graph([(wind_turbines[0], wind_turbines[1]), (solar_cells[0], solar_cells[1]), ('D', 'E')])
+denmark = Graph([(copenhagen, aarhus)])
 pretty_print = pprint.PrettyPrinter()
-pretty_print.pprint(g._graph)
+pretty_print.pprint(denmark._graph)
+"""

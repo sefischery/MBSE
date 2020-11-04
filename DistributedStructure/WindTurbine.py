@@ -7,8 +7,7 @@ file_path = (base_path / "../weather_copenhagen.csv").resolve()
 
 
 class WindTurbine(object):
-    def __init__(self, id, wing_size):
-        self.id = id
+    def __init__(self, wing_size):
         self.A = pow(wing_size, 2) * np.pi
         self.log = weather_history.WeatherLog(file_path)
 
