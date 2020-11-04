@@ -92,4 +92,6 @@ import numpy as np
 fig, ax = plt.subplots(1, 1, figsize=(16, 9), dpi=80)
 ax.fill_between(np.arange(0, SIM_TIME), y1=Hourly_energy_consumer_consumption, y2=0, label="Grid levels", alpha=0.5,
                 color='tab:red', linewidth=2)
+plt.xlabel("Hour of day")
+plt.ylabel("Energy usage")
 plt.show()
