@@ -39,9 +39,9 @@ class EnergyGrid(object):
             criticalCities = []
             supportiveCities = []
             for city in self.cities:
-                if city.battery.level / city.battery.capacity < 0.1:
+                if city.battery.level / city.battery.capacity < 0.1: # less than 10 % of battery's capacity, then it's a critical city
                     criticalCities.append(city) # Critical cities
-                elif city.battery.level / city.battery.capacity > 0.20:
+                elif city.battery.level / city.battery.capacity > 0.20: # if city has 20% or more of battery's capacity then it's a supportivecity.
                     supportiveCities.append(city) # Balanced city energy level
             if len(criticalCities) > 0 and len(supportiveCities) > 0:
                 env.process(self.PerformCityEnergyDistribution(criticalCities, supportiveCities))
