@@ -6,13 +6,11 @@ from DistributedStructure.City import City
 from DistributedStructure.Consumer import Consumer, select_random_consumer_type, select_random_resource_type
 from DistributedStructure.WindTurbine import WindTurbine
 
-
-SIM_TIME = 24
-NUMB_OF_CITIES = 10
-NUMB_OF_WINDTURBINES = 10
+SIM_TIME = 24 # Hours
+NUMB_OF_CITIES = 6 # Number of cities
+NUMB_OF_WINDTURBINES = 3 # Number of windturbines in our grid.
 
 WING_SIZE = [20, 80]
-
 
 class EnergyGrid(object):
     def __init__(self, env):

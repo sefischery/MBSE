@@ -24,5 +24,11 @@ class City(object):
             yield self.env.timeout(1)
 
     def process_incoming_energy(self, energy):
-        self.battery.put(energy)
-
+        batteryDistance = self.battery.capacity - self.battery.level
+        if energy > batteryDistance:
+            # This means too energy was sent to the city we might consider shutting down some systems or sell the energy
+            energy -= batteryDistance
+            self.battery.put(batteryDistance)
+        else:
+            # All incoming energy was distributed to the battery
+            self.battery.put(energy)
