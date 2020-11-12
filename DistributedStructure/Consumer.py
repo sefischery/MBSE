@@ -39,6 +39,10 @@ class Consumer(object):
         self.consumedEnergy = 0
         self.generatedEnergy = 0
 
+        # Plots
+        self.consumerGeneratedEnergyGraphPoints = []
+        self.consumerConsumptionEnergyGraphPoints = []
+
         self.consumedEnergyTick = 0
         self.generatedEnergyTick = 0
 
@@ -59,6 +63,7 @@ class Consumer(object):
 
             self.consumedEnergy += energyConsumption
             self.consumedEnergyTick = energyConsumption
+            self.consumerConsumptionEnergyGraphPoints.append(energyConsumption)
             yield self.env.timeout(1)
 
     def generate_resource_energy(self):
@@ -67,6 +72,7 @@ class Consumer(object):
                 energyGenerated = self.resource.power(datetime.datetime(2019, 1, 1, self.env.now))
                 self.generatedEnergy += energyGenerated
                 self.generatedEnergyTick = energyGenerated
+                self.consumerGeneratedEnergyGraphPoints.append(energyGenerated)
                 yield self.env.timeout(1)
 
     def set_resource(self, resource):

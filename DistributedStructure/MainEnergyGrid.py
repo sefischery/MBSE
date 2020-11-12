@@ -6,6 +6,7 @@ from DistributedStructure.City import City
 from DistributedStructure.Consumer import Consumer, select_random_consumer_type, select_random_resource_type
 from DistributedStructure.WindTurbine import WindTurbine
 
+
 SIM_TIME = 24
 NUMB_OF_CITIES = 10
 NUMB_OF_WINDTURBINES = 10
@@ -130,3 +131,21 @@ for city in VirtualPowerGrid.cities:
     print(f"total city energy consumption: {cityConsumption}")
     print()
 print(f"Total windturbine energy generate: {VirtualPowerGrid.totalEnergyGenerated}")
+
+# Plots
+# Plot results
+from matplotlib import pyplot as plt
+import numpy as np
+
+for consumer in VirtualPowerGrid.cities[0].consumerList:
+    # Draw plot
+    if len(consumer.consumerGeneratedEnergyGraphPoints) > 0:
+
+        #fig, ax = plt.subplots(1, 1, figsize=(16, 9), dpi=80)
+        #ax.fill_between(np.arange(0, SIM_TIME), y1=consumer.consumerGeneratedEnergyGraphPoints, y2=0, label="", alpha=0.5,
+        #                color='tab:red', linewidth=2)
+
+        plt.plot(np.arange(0, SIM_TIME), consumer.consumerGeneratedEnergyGraphPoints, color='tab:red')
+        plt.xlabel("Hour of day")
+        plt.ylabel("Energy usage")
+plt.show()
