@@ -3,14 +3,19 @@ import random
 import simpy
 
 from DistributedStructure.City import City
-from DistributedStructure.Consumer import Consumer, select_random_consumer_type, select_random_resource_type
+from DistributedStructure.Consumer import Consumer, select_random_consumer_type, \
+    select_random_resource_type
+from DistributedStructure.SolarCell import SolarCell
 from DistributedStructure.WindTurbine import WindTurbine
 
-SIM_TIME = 24 # Hours
-NUMB_OF_CITIES = 6 # Number of cities
-NUMB_OF_WINDTURBINES = 3 # Number of windturbines in our grid.
-
+SIM_TIME = 24  # Hours
+NUMB_OF_CITIES = 6  # Number of cities
+NUMB_OF_WINDTURBINES = 3  # Number of windturbines in our grid.
+CHANCE_OF_SOLAR_CELL = 75
+CHANCE_OF_NO_SOLAR_CELL = 25
 WING_SIZE = [20, 80]
+list_of_resources = [None, SolarCell()]
+
 
 class EnergyGrid(object):
     def __init__(self, env):
@@ -103,7 +108,11 @@ VirtualPowerGrid.set_resources(Windturbines)
 for city in VirtualPowerGrid.cities:
     consumers = [Consumer(env, select_random_consumer_type(), i) for i in range(random.randint(10, 20))]
     for consumer in consumers:
-        resource = select_random_resource_type()
+        # 25% change of NOT getting a solar cell,
+        # and 75% change of GETTING a solar cell
+        resource = select_random_resource_type(list_of_resources,
+                                               CHANCE_OF_NO_SOLAR_CELL,
+                                               CHANCE_OF_SOLAR_CELL)
         consumer.set_resource(resource)  # Set generation resource
         consumer.set_resource_size(random.randint(10, 80))  # set size of resource
         city.add_consumer(consumer)
