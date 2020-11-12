@@ -25,6 +25,7 @@ listOfConsumers_dict = {
 
 listOfConsumers = [RegularConsumerHourly, NightConsumerHourly, HomeConsumerHourly, HighUsageConsumerHourly]
 
+listOfResources = [None, SolarCell(), SolarCell(), SolarCell()]
 
 
 class Consumer(object):
@@ -101,10 +102,5 @@ def select_random_consumer_type():
     return random.choice(list(listOfConsumers_dict.keys()))
 
 
-def select_random_resource_type(list_of_resources, percentage_x, percentage_y):
-    if len(list_of_resources) > 2:
-        raise Exception("select_random_resource_type only takes two resource"
-                        " types")
-
-    return random.choices(list_of_resources,
-                          weighs=[percentage_x, percentage_y])
+def select_random_resource_type():
+    return random.choice(listOfResources)
