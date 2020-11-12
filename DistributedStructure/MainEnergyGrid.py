@@ -16,6 +16,8 @@ CHANCE_OF_NO_SOLAR_CELL = 25
 WING_SIZE = [20, 80]
 list_of_resources = [None, SolarCell()]
 
+WindTurbineEnergyGeneration = []
+
 
 class EnergyGrid(object):
     def __init__(self, env):
@@ -43,30 +45,32 @@ class EnergyGrid(object):
             criticalCities = []
             supportiveCities = []
             for city in self.cities:
-                if city.battery.level / city.battery.capacity < 0.1: # less than 10 % of battery's capacity, then it's a critical city
-                    criticalCities.append(city) # Critical cities
-                elif city.battery.level / city.battery.capacity > 0.20: # if city has 20% or more of battery's capacity then it's a supportivecity.
-                    supportiveCities.append(city) # Balanced city energy level
+                if city.battery.level / city.battery.capacity < 0.1:  # less than 10 % of battery's capacity, then it's a critical city
+                    criticalCities.append(city)  # Critical cities
+                elif city.battery.level / city.battery.capacity > 0.20:  # if city has 20% or more of battery's capacity then it's a supportivecity.
+                    supportiveCities.append(city)  # Balanced city energy level
             if len(criticalCities) > 0 and len(supportiveCities) > 0:
                 env.process(self.perform_city_energy_distribution(criticalCities, supportiveCities))
             yield self.env.timeout(1)
 
     def perform_city_energy_distribution(self, criticalCities, supportiveCities):
         for criticalCity in criticalCities:
-            neededEnergy = ((criticalCity.battery.capacity * 0.15)-criticalCity.battery.level)
+            neededEnergy = ((criticalCity.battery.capacity * 0.15) - criticalCity.battery.level)
             for supportiveCity in supportiveCities:
                 if neededEnergy > 0:
-                    surPlusEnergy = (supportiveCity.battery.level-(supportiveCity.battery.capacity * 0.20))
+                    surPlusEnergy = (supportiveCity.battery.level - (supportiveCity.battery.capacity * 0.20))
                     if surPlusEnergy > 0:
                         if surPlusEnergy < neededEnergy:
                             neededEnergy -= surPlusEnergy
                             supportiveCity.battery.get(surPlusEnergy)
                             criticalCity.battery.put(surPlusEnergy)
-                            print(f"City {supportiveCity.cityNumber}, sends energy level {surPlusEnergy}, to city {criticalCity.cityNumber}")
+                            print(
+                                f"City {supportiveCity.cityNumber}, sends energy level {surPlusEnergy}, to city {criticalCity.cityNumber}")
                         else:
                             supportiveCity.battery.get(neededEnergy)
                             criticalCity.battery.put(neededEnergy)
-                            print(f"City {supportiveCity.cityNumber}, sends energy level {neededEnergy}, to city {criticalCity.cityNumber}")
+                            print(
+                                f"City {supportiveCity.cityNumber}, sends energy level {neededEnergy}, to city {criticalCity.cityNumber}")
                             neededEnergy -= neededEnergy
 
         yield self.env.timeout(1)
@@ -78,6 +82,7 @@ class EnergyGrid(object):
                 self.resourceGeneratedEnergy += resource.power(datetime.datetime(2019, 1, 1, self.env.now))
 
             self.totalEnergyGenerated += self.resourceGeneratedEnergy
+            WindTurbineEnergyGeneration.append(self.resourceGeneratedEnergy)
             yield self.env.timeout(1)
 
     def distribute_generated_energy(self):
@@ -114,7 +119,7 @@ for city in VirtualPowerGrid.cities:
                                                CHANCE_OF_NO_SOLAR_CELL,
                                                CHANCE_OF_SOLAR_CELL)
         consumer.set_resource(resource)  # Set generation resource
-        consumer.set_resource_size(random.randint(10, 80))  # set size of resource
+        consumer.set_resource_size(random.uniform(10, 80))  # set size of resource
         city.add_consumer(consumer)
 
     batteryCapacity = len(city.consumerList) * 5000
@@ -141,18 +146,55 @@ print(f"Total windturbine energy generate: {VirtualPowerGrid.totalEnergyGenerate
 
 # Plots
 # Plot results
-from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt, patches as pa
+import seaborn as sns
 import numpy as np
 
-for consumer in VirtualPowerGrid.cities[0].consumerList:
-    # Draw plot
-    if len(consumer.consumerGeneratedEnergyGraphPoints) > 0:
+sns.set_theme()
 
-        #fig, ax = plt.subplots(1, 1, figsize=(16, 9), dpi=80)
-        #ax.fill_between(np.arange(0, SIM_TIME), y1=consumer.consumerGeneratedEnergyGraphPoints, y2=0, label="", alpha=0.5,
-        #                color='tab:red', linewidth=2)
+def pick_random_color():
+    r = random.random()
+    b = random.random()
+    g = random.random()
+    return r, g, b
 
-        plt.plot(np.arange(0, SIM_TIME), consumer.consumerGeneratedEnergyGraphPoints, color='tab:red')
-        plt.xlabel("Hour of day")
-        plt.ylabel("Energy usage")
+
+plt.figure(figsize=(20, 10))
+# Consumer energy generation plot
+for city in VirtualPowerGrid.cities:
+    plt1 = []
+    for consumer in city.consumerList:
+        # Draw plot
+        if len(consumer.consumerGeneratedEnergyGraphPoints) > 0:
+            plt1 = plt.plot(np.arange(0, SIM_TIME), consumer.consumerGeneratedEnergyGraphPoints,
+                            color=pick_random_color())
+            plt.xlabel("Hour of day")
+            plt.ylabel("Consumer Generation")
+    plt1[0].set_label(f"city {city.cityNumber}")
+plt.legend()
+plt.show()
+
+plt.figure(figsize=(20, 10))
+# Draw windturbine energy generation
+plt.plot(np.arange(0, SIM_TIME), WindTurbineEnergyGeneration, color='tab:red', label='Wind Turbine')
+plt.xlabel("Hour of day")
+plt.ylabel("Windturbine Generation")
+plt.legend()
+plt.show()
+
+plt.figure(figsize=(20, 10))
+# Cities Bar plot
+for city in VirtualPowerGrid.cities:
+    cityEnergyGeneration = 0
+    cityEnergyConsumption = 0
+    for consumer in city.consumerList:
+        cityEnergyConsumption += np.sum(consumer.consumerConsumptionEnergyGraphPoints)
+        cityEnergyGeneration += np.sum(consumer.consumerGeneratedEnergyGraphPoints)
+    plt.bar(city.cityNumber, cityEnergyConsumption, 0.8, color='r', alpha=0.3)
+    plt.bar(city.cityNumber, cityEnergyGeneration, 0.8, color='g', alpha=0.4)
+plt.xlabel("Cities")
+plt.ylabel("Energy Level")
+redLabel = pa.Patch(color='r', label='Energy consumption')
+greenLabel = pa.Patch(color='g', label='Energy Generation')
+plt.legend(handles=[redLabel, greenLabel])
 plt.show()
