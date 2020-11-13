@@ -78,7 +78,8 @@ class Consumer(object):
         self.resource = resource
 
     def set_resource_size(self, size):
-        if self.resource is SolarCell:
+        if self.resource is not None:
+            print(size)
             self.resource.set_squaremeter_size(size)
 
     def process_city_energy_grid(self, cityNumber, battery):
@@ -106,4 +107,4 @@ def select_random_resource_type(list_of_resources, percentage_x, percentage_y):
                         " types")
 
     return random.choices(list_of_resources,
-                          weights=[percentage_x, percentage_y])[0]
+                          weighs=[percentage_x, percentage_y])
