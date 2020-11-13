@@ -5,7 +5,7 @@ import datetime
 class WeatherLog:
     def __init__(self, csv_path):
         self.dataFrame = pd.read_csv(csv_path, sep=';',
-                                     index_col="timestamp_local")
+                                     index_col="timestamp_utc")
 
     def get_solar_rad(self, time):
         solar_before = self.dataFrame.loc[

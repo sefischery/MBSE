@@ -6,9 +6,10 @@ from DistributedStructure.City import City
 from DistributedStructure.Consumer import Consumer, select_random_consumer_type, select_random_resource_type
 from DistributedStructure.WindTurbine import WindTurbine
 
-SIM_TIME = 24 # Hours
-NUMB_OF_CITIES = 6 # Number of cities
-NUMB_OF_WINDTURBINES = 3 # Number of windturbines in our grid.
+days = 2
+SIM_TIME = 24 * days # Hours
+NUMB_OF_CITIES = 10 # Number of cities
+NUMB_OF_WINDTURBINES = 6 # Number of windturbines in our grid.
 
 WING_SIZE = [20, 80]
 
@@ -72,20 +73,26 @@ class EnergyGrid(object):
         yield self.env.timeout(1)
 
     def get_generated_energy(self):
+        date = datetime.datetime(2019, 1, 1, 0)
+
         while True:
             self.resourceGeneratedEnergy = 0
+
             for resource in self.resources:
-                self.resourceGeneratedEnergy += resource.power(datetime.datetime(2019, 1, 1, self.env.now))
+                self.resourceGeneratedEnergy += resource.power(date)
 
             self.totalEnergyGenerated += self.resourceGeneratedEnergy
             WindTurbineEnergyGeneration.append(self.resourceGeneratedEnergy)
+
+            date += datetime.timedelta(hours=1)
             yield self.env.timeout(1)
 
     def distribute_generated_energy(self):
         while True:
-            energyLevelToDistribute = self.resourceGeneratedEnergy / len(self.cities)
-            for city in self.cities:
-                city.process_incoming_energy(energyLevelToDistribute)
+            if self.resourceGeneratedEnergy > 0:
+                energyLevelToDistribute = self.resourceGeneratedEnergy / len(self.cities)
+                for city in self.cities:
+                    city.process_incoming_energy(energyLevelToDistribute)
             yield self.env.timeout(1)
 
 
@@ -111,11 +118,11 @@ for city in VirtualPowerGrid.cities:
     for consumer in consumers:
         resource = select_random_resource_type()
         consumer.set_resource(resource)  # Set generation resource
-        consumer.set_resource_size(random.uniform(10, 80))  # set size of resource
+        consumer.set_resource_size(random.uniform(15, 40))  # set size of resource
         city.add_consumer(consumer)
 
     batteryCapacity = len(city.consumerList) * 5000
-    cityBatteryContainer = simpy.Container(env, batteryCapacity, init=0.35 * batteryCapacity)
+    cityBatteryContainer = simpy.Container(env, batteryCapacity, init=batteryCapacity) #0.35 * batteryCapacity)
     city.add_battery(cityBatteryContainer)
 
 # Execute!

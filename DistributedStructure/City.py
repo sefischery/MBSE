@@ -1,3 +1,6 @@
+batteryEnergyEfficiency = 0.75 # Battery charging loss
+
+
 class City(object):
     def __init__(self, env, cityNumber):
         # Input parameter initialized
@@ -25,10 +28,11 @@ class City(object):
 
     def process_incoming_energy(self, energy):
         batteryDistance = self.battery.capacity - self.battery.level
-        if energy > batteryDistance:
-            # This means too energy was sent to the city we might consider shutting down some systems or sell the energy
-            energy -= batteryDistance
-            self.battery.put(batteryDistance)
-        else:
-            # All incoming energy was distributed to the battery
-            self.battery.put(energy)
+        if batteryDistance > 0:
+            if energy > batteryDistance:
+                # This means too energy was sent to the city we might consider shutting down some systems or sell the energy
+                energy -= batteryDistance
+                self.battery.put(batteryDistance * batteryEnergyEfficiency)
+            else:
+                # All incoming energy was distributed to the battery
+                self.battery.put(energy * batteryEnergyEfficiency)

@@ -23,6 +23,8 @@ listOfConsumers_dict = {
     "HighUsageConsumer": HighUsageConsumerHourly
 }
 
+batteryEnergyEfficiency = 0.75 # 25 % Loss
+
 listOfConsumers = [RegularConsumerHourly, NightConsumerHourly, HomeConsumerHourly, HighUsageConsumerHourly]
 
 listOfResources = [None, 'solarCell', 'solarCell', 'solarCell']
@@ -59,7 +61,7 @@ class Consumer(object):
             fluctuation = random.uniform(-0.0075, 0.0075)
 
             typeList = listOfConsumers_dict.get(self.type)
-            energyConsumption = DAILY_USAGE * (typeList[self.env.now] + fluctuation)
+            energyConsumption = DAILY_USAGE * (typeList[self.env.now % 24] + fluctuation)
 
             self.consumedEnergy += energyConsumption
             self.consumedEnergyTick = energyConsumption
@@ -67,12 +69,14 @@ class Consumer(object):
             yield self.env.timeout(1)
 
     def generate_resource_energy(self):
+        date = datetime.datetime(2019, 1, 1, 0)
         if self.resource is not None:
             while True:
-                energyGenerated = self.resource.power(datetime.datetime(2019, 1, 1, self.env.now))
+                energyGenerated = self.resource.power(date)
                 self.generatedEnergy += energyGenerated
                 self.generatedEnergyTick = energyGenerated
                 self.consumerGeneratedEnergyGraphPoints.append(energyGenerated)
+                date += datetime.timedelta(hours=1)
                 yield self.env.timeout(1)
 
     def set_resource(self, resource):
@@ -80,18 +84,17 @@ class Consumer(object):
 
     def set_resource_size(self, size):
         if self.resource is not None:
-            print(size)
             self.resource.set_squaremeter_size(size)
 
     def process_city_energy_grid(self, cityNumber, battery):
         energy = self.generatedEnergyTick - self.consumedEnergyTick
         if energy > 0:
-            battery.put(energy) # Give energy to city battery
+            battery.put(energy * batteryEnergyEfficiency) # Give energy to city battery
 
         elif energy < 0:
             energy = abs(energy)
-            if energy > battery.level: # House will experience power outage
-                print(f"Power outage in city: {cityNumber}; house: {self.houseNumber}")
+            #if energy > battery.level: # House will experience power outage
+                #print(f"Power outage in city: {cityNumber}; house: {self.houseNumber}")
 
             self.cityBatteryUsage += energy
             battery.get(energy) # Take energy from city battery
