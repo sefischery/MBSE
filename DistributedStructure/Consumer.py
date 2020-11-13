@@ -105,6 +105,16 @@ class Consumer(object):
             battery.get(energy) # Take energy from city battery
         yield self.env.timeout(1)
 
+    def getResults(self):
+        return {
+            "consumedEnergyTotal": self.consumedEnergyTotal,
+            "consumedEnergyHistory": self.consumedEnergyHistory,
+            "generatedEnergyTotal": self.generatedEnergyTotal,
+            "generatedEnergyHistory": self.generatedEnergyHistory,
+            "cityBatteryUsage": self.cityBatteryUsage,
+            "type": self.type
+        }
+
 
 def select_random_consumer_type():
     return random.choice(list(listOfConsumers_dict.keys()))

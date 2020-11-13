@@ -1,3 +1,5 @@
+import json
+
 batteryEnergyEfficiency = 0.75 # Battery charging loss
 
 
@@ -36,3 +38,10 @@ class City(object):
             else:
                 # All incoming energy was distributed to the battery
                 self.battery.put(energy * batteryEnergyEfficiency)
+
+
+    def getResults(self):
+        return {
+            "city_number": self.cityNumber,
+            "consumers": list(map(lambda x: x.getResults(), self.consumerList))
+        }
