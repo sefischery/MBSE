@@ -33,7 +33,7 @@ class WindTurbine(object):
     # Typically 95 %
     Nb = 0.95
 
-    def power(self, datetime):
+    def power(self, datetime_utc):
         power = 0.5 * self.p * self.A * self.Cp * pow(
-            self.log.get_wind_speed(datetime), 3) * self.Ng * self.Nb
+            self.log.get_wind_speed(weather_history.utc_to_danish_time(datetime_utc)), 3) * self.Ng * self.Nb
         return power / 10000

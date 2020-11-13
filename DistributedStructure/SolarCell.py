@@ -14,5 +14,5 @@ class SolarCell(object):
         self.squaremeters = squaremeters_size
         self.online = True
 
-    def power(self, datetime):
-        return self.log.get_solar_rad(datetime) * random.uniform(0.175, 0.225) * self.squaremeters
+    def power(self, datetime_utc):
+        return self.log.get_solar_rad(weather_history.utc_to_danish_time(datetime_utc)) * random.uniform(0.175, 0.225) * self.squaremeters

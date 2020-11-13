@@ -1,4 +1,5 @@
 import datetime
+import pytz
 import random
 import simpy
 
@@ -6,12 +7,8 @@ from DistributedStructure.City import City
 from DistributedStructure.Consumer import Consumer, select_random_consumer_type, random_solar_cell
 from DistributedStructure.WindTurbine import WindTurbine
 
-days = 2
-SIM_TIME = 24 * days # Hours
-NUMB_OF_CITIES = 10 # Number of cities
-NUMB_OF_WINDTURBINES = 6 # Number of windturbines in our grid.
+from constants import *
 
-WING_SIZE = [20, 80]
 
 WindTurbineEnergyGeneration = []
 
@@ -73,18 +70,18 @@ class EnergyGrid(object):
         yield self.env.timeout(1)
 
     def get_generated_energy(self):
-        date = datetime.datetime(2019, 1, 1, 0)
+        date_utc = datetime.datetime(START_YEAR, START_MONTH, START_DAY, START_HOUR)
 
         while True:
             self.resourceGeneratedEnergy = 0
 
             for resource in self.resources:
-                self.resourceGeneratedEnergy += resource.power(date)
+                self.resourceGeneratedEnergy += resource.power(date_utc)
 
             self.totalEnergyGenerated += self.resourceGeneratedEnergy
             WindTurbineEnergyGeneration.append(self.resourceGeneratedEnergy)
 
-            date += datetime.timedelta(hours=1)
+            date_utc += datetime.timedelta(hours=1)
             yield self.env.timeout(1)
 
     def distribute_generated_energy(self):
