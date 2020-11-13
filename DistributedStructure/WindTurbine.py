@@ -12,7 +12,7 @@ class WindTurbine(object):
         self.log = weather_history.WeatherLog(file_path)
 
         # Total amount produced by this wind turbine
-        self.totalProduces
+        self.totalProduced = 0
 
     def __repr__(self):
         return '{}({})'.format(self.__class__.__name__, self.id)
@@ -40,6 +40,6 @@ class WindTurbine(object):
     def power(self, datetime):
         power = 0.5 * self.p * self.A * self.Cp * pow(
             self.log.get_wind_speed(datetime), 3) * self.Ng * self.Nb
-        power =/ 10000
-        self.totalProduces += power
+        power = power / 10000
+        self.totalProduced += power
         return power
