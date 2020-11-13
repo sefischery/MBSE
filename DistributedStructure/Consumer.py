@@ -104,7 +104,7 @@ def select_random_consumer_type():
     return random.choice(list(listOfConsumers_dict.keys()))
 
 
-def select_random_resource_type():
+def random_solar_cell():
     if random.random() < SOLAR_CELL_RATE:
         size = random.uniform(*SOLAR_CELL_SIZE)
         return SolarCell(size)
