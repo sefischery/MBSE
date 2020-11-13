@@ -10,6 +10,7 @@ class WindTurbine(object):
     def __init__(self, wing_size):
         self.A = pow(wing_size, 2) * np.pi
         self.log = weather_history.WeatherLog(file_path)
+        self.online = True
 
 
     # https://www.ajdesigner.com/phpwindpower/wind_generator_power_performance_coefficient.php
