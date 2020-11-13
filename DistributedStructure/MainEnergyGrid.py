@@ -150,8 +150,8 @@ output = json.dumps({
 })
 #print (output)
 
-if os.path.exists("plots/output.json"):
-    os.remove("plots/output.json")
-f = open("plots/output.json", "a")
+if os.path.exists("../plots/output.json"):
+    os.remove("../plots/output.json")
+f = open("../plots/output.json", "a")
 f.write(output)
 f.close()
