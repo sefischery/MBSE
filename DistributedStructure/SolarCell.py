@@ -12,6 +12,7 @@ class SolarCell(object):
     def __init__(self, squaremeters_size):
         self.log = weather_history.WeatherLog(file_path)
         self.squaremeters = squaremeters_size
+        self.online = True
 
     def __repr__(self):
         return '{}({})'.format(self.__class__.__name__, self.id)
