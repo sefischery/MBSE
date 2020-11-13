@@ -36,3 +36,6 @@ class City(object):
             else:
                 # All incoming energy was distributed to the battery
                 self.battery.put(energy * batteryEnergyEfficiency)
+                energy -= energy
+
+        return energy
