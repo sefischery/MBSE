@@ -3,6 +3,8 @@ import matplotlib as mpl
 import numpy as np
 import json
 
+# TODO: Add plots for `power received' and `power transmitted'
+
 # Meta data
 with open("../plots/output.json", "r") as f:
     VirtualPowerGrid = json.load(f)
