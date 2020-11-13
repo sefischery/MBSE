@@ -25,7 +25,7 @@ listOfConsumers_dict = {
 
 listOfConsumers = [RegularConsumerHourly, NightConsumerHourly, HomeConsumerHourly, HighUsageConsumerHourly]
 
-listOfResources = [None, SolarCell(), SolarCell(), SolarCell()]
+listOfResources = [None, 'solarCell', 'solarCell', 'solarCell']
 
 
 class Consumer(object):
@@ -103,4 +103,8 @@ def select_random_consumer_type():
 
 
 def select_random_resource_type():
-    return random.choice(listOfResources)
+    resource = random.choice(listOfResources)
+    if resource == 'solarCell':
+        return SolarCell()
+
+    return None
