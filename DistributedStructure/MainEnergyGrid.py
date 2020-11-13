@@ -141,13 +141,12 @@ for city in VirtualPowerGrid.cities:
     print()
 print(f"Total windturbine energy generate: {VirtualPowerGrid.totalEnergyGenerated}")
 
-# Plots
-# Plot results
+# Plotting
 from matplotlib import pyplot as plt, patches as pa
-import seaborn as sns
 import numpy as np
 
-sns.set_theme()
+#import seaborn as sns
+# sns.set_theme()
 
 def pick_random_color():
     r = random.random()
