@@ -24,11 +24,16 @@ class EnergyGrid(object):
         self.resources = []
         self.resourceGeneratedEnergy = 0
         self.totalEnergyGenerated = 0
+        self.resourceBattery = None
 
         # Start Grid processes
         env.process(self.get_generated_energy())
         env.process(self.distribute_generated_energy())
         env.process(self.overwatch_cities())
+        env.process(self.overwatch_resource_battery())
+
+    def set_battery(self, battery):
+        self.resourceBattery = battery
 
     def set_cities(self, cities):
         self.cities = cities
@@ -41,20 +46,71 @@ class EnergyGrid(object):
             criticalCities = []
             supportiveCities = []
             for city in self.cities:
-                if city.battery.level / city.battery.capacity < 0.1:  # less than 10 % of battery's capacity, then it's a critical city
+                if city.battery.level / city.battery.capacity < 0.25:  # less than 10 % of battery's capacity, then it's a critical city
                     criticalCities.append(city)  # Critical cities
-                elif city.battery.level / city.battery.capacity > 0.20:  # if city has 20% or more of battery's capacity then it's a supportivecity.
+                elif city.battery.level / city.battery.capacity > 0.50:  # if city has 20% or more of battery's capacity then it's a supportivecity.
                     supportiveCities.append(city)  # Balanced city energy level
             if len(criticalCities) > 0 and len(supportiveCities) > 0:
                 env.process(self.perform_city_energy_distribution(criticalCities, supportiveCities))
+
+            # In case we still have critical cities, distribute energy from resource battery
+            self.distribute_to_critical_city_from_resource_battery()
+
             yield self.env.timeout(1)
+
+    def distribute_to_critical_city_from_resource_battery(self):
+        for city in self.cities:
+            if city.battery.level / city.battery.capacity < 0.25:  # less than 10 % of battery's capacity, then it's a critical city
+                neededEnergy = ((city.battery.capacity * 0.30) - city.battery.level)
+                if self.resourceBattery.level > neededEnergy:
+                    city.battery.put(neededEnergy)
+                    self.resourceBattery.get(neededEnergy)
+                else:
+                    if self.resourceBattery.level > 0:
+                        city.battery.put(self.resourceBattery.level)
+                        self.resourceBattery.get(self.resourceBattery.level)
+
+    def overwatch_resource_battery(self):
+        while True:
+            current_resource_battery_procentage_level = (self.resourceBattery.level / self.resourceBattery.capacity) * 100
+            difficultyRating = 100
+            for resource in self.resources:
+                if resource.online:
+                    difficultyRating -= 25 / NUMB_OF_WINDTURBINES
+
+            if current_resource_battery_procentage_level > difficultyRating:
+                resource = self.choose_random_resource(self.resources, True)
+                if resource is not None:
+                    resource.online = False
+                    print("Turns off a Windturbine")
+
+            if current_resource_battery_procentage_level < difficultyRating - 30:
+                resource = self.choose_random_resource(self.resources, False)
+                if resource is not None:
+                    resource.online = True
+                    print("Turns on a Windturbine")
+
+            yield self.env.timeout(1)
+
+    @staticmethod
+    def choose_random_resource(resources, status):
+        chooseBetween = []
+        resource = None
+        for _resource in resources:
+            if _resource.online == status:
+                chooseBetween.append(_resource)
+
+        if len(chooseBetween) > 0:
+            resource = random.choice(chooseBetween)
+
+        return resource
 
     def perform_city_energy_distribution(self, criticalCities, supportiveCities):
         for criticalCity in criticalCities:
-            neededEnergy = ((criticalCity.battery.capacity * 0.15) - criticalCity.battery.level)
+            neededEnergy = ((criticalCity.battery.capacity * 0.30) - criticalCity.battery.level)
             for supportiveCity in supportiveCities:
                 if neededEnergy > 0:
-                    surPlusEnergy = (supportiveCity.battery.level - (supportiveCity.battery.capacity * 0.20))
+                    surPlusEnergy = (supportiveCity.battery.level - (supportiveCity.battery.capacity * 0.50))
                     if surPlusEnergy > 0:
                         if surPlusEnergy < neededEnergy:
                             neededEnergy -= surPlusEnergy
@@ -78,7 +134,8 @@ class EnergyGrid(object):
             self.resourceGeneratedEnergy = 0
 
             for resource in self.resources:
-                self.resourceGeneratedEnergy += resource.power(date_utc)
+                if resource.online:
+                    self.resourceGeneratedEnergy += resource.power(date_utc)
 
             self.totalEnergyGenerated += self.resourceGeneratedEnergy
             WindTurbineEnergyGeneration.append(self.resourceGeneratedEnergy)
@@ -91,8 +148,24 @@ class EnergyGrid(object):
             if self.resourceGeneratedEnergy > 0:
                 energyLevelToDistribute = self.resourceGeneratedEnergy / len(self.cities)
                 for city in self.cities:
-                    city.process_incoming_energy(energyLevelToDistribute)
+                    remainingEnergy = city.process_incoming_energy(energyLevelToDistribute)
+                    self.fill_resource_battery(remainingEnergy)
             yield self.env.timeout(1)
+
+    def fill_resource_battery(self, energy):
+        if energy > 0:
+            batteryCapacityDifferenceFromBatteryLevel = self.resourceBattery.capacity - self.resourceBattery.level
+            if batteryCapacityDifferenceFromBatteryLevel != 0:
+                if energy > batteryCapacityDifferenceFromBatteryLevel:
+                    initialEnergy = energy
+                    energy = batteryCapacityDifferenceFromBatteryLevel
+                    print(f"Windturbines store: {energy}, energy wasted: {initialEnergy-energy}")
+
+                self.resourceBattery.put(energy)
+            else:
+                print(f"Windturbines store: {0}, energy wasted: {energy}")
+
+
 
 
 # Setup
@@ -111,6 +184,11 @@ Cities = [City(env, i) for i in range(NUMB_OF_CITIES)]
 VirtualPowerGrid.set_cities(Cities)
 VirtualPowerGrid.set_resources(Windturbines)
 
+# Add resource battery
+capatity = NUMB_OF_WINDTURBINES * 50000
+windturbineBatteryContainer = simpy.Container(env, capatity, init=capatity * 0.85)
+VirtualPowerGrid.set_battery(windturbineBatteryContainer)
+
 # Add Consumers & Battery to Cities
 for city in VirtualPowerGrid.cities:
     consumers = [Consumer(env, select_random_consumer_type(), i) for i in range(random.randint(10, 20))]
@@ -118,8 +196,8 @@ for city in VirtualPowerGrid.cities:
         consumer.set_resource(random_solar_cell())  # Set generation resource
         city.add_consumer(consumer)
 
-    batteryCapacity = len(city.consumerList) * 5000
-    cityBatteryContainer = simpy.Container(env, batteryCapacity, init=batteryCapacity) #0.35 * batteryCapacity)
+    batteryCapacity = len(city.consumerList) * 10000
+    cityBatteryContainer = simpy.Container(env, batteryCapacity, init=batteryCapacity * 0.7) #0.35 * batteryCapacity)
     city.set_battery(cityBatteryContainer)
 
 # Execute!
@@ -140,6 +218,7 @@ for city in VirtualPowerGrid.cities:
     print()
 print(f"Total windturbine energy generate: {VirtualPowerGrid.totalEnergyGenerated}")
 
+print(f"End Windturbine battery level: {VirtualPowerGrid.resourceBattery.level}, max capacity: {VirtualPowerGrid.resourceBattery.capacity}")
 output = json.dumps({
     "cities": list(map(lambda x: x.getResults(),VirtualPowerGrid.cities)),
     "sim_time": SIM_TIME,
