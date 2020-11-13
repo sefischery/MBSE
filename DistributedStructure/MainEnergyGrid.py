@@ -1,6 +1,8 @@
 import datetime
 import random
 import simpy
+import json
+import os
 
 from DistributedStructure.City import City
 from DistributedStructure.Consumer import Consumer, select_random_consumer_type, random_solar_cell
@@ -121,7 +123,7 @@ for city in VirtualPowerGrid.cities:
 
     batteryCapacity = len(city.consumerList) * 5000
     cityBatteryContainer = simpy.Container(env, batteryCapacity, init=batteryCapacity) #0.35 * batteryCapacity)
-    city.add_battery(cityBatteryContainer)
+    city.set_battery(cityBatteryContainer)
 
 # Execute!
 env.run(until=SIM_TIME)
@@ -133,65 +135,24 @@ for city in VirtualPowerGrid.cities:
         f"City: {city.cityNumber}, number of consumers in city: {len(city.consumerList)}, city battery level: {city.battery.level}, battery max capacity: {city.battery.capacity}")
     cityConsumption = 0
     for consumer in city.consumerList:
-        cityConsumption += consumer.consumedEnergy
+        cityConsumption += consumer.consumedEnergyTotal
         print(f"    Consumertype: {consumer.type}, total energy consumed "
-              f"{consumer.consumedEnergy}, total energy generated: {consumer.generatedEnergy}, "
+              f"{consumer.consumedEnergyTotal}, total energy generated: {consumer.generatedEnergyTotal}, "
               f"total energy used from battery: {consumer.cityBatteryUsage}")
     print(f"total city energy consumption: {cityConsumption}")
     print()
 print(f"Total windturbine energy generate: {VirtualPowerGrid.totalEnergyGenerated}")
 
-# Plots
-# Plot results
-from matplotlib import pyplot as plt, patches as pa
-import seaborn as sns
-import numpy as np
 
-sns.set_theme()
+output = json.dumps({
+    "cities": list(map(lambda x: x.getResults(),VirtualPowerGrid.cities)),
+    "sim_time": SIM_TIME,
+    "wind_turbine_generation_history": WindTurbineEnergyGeneration
+})
+#print (output)
 
-def pick_random_color():
-    r = random.random()
-    b = random.random()
-    g = random.random()
-    return r, g, b
-
-
-plt.figure(figsize=(20, 10))
-# Consumer energy generation plot
-for city in VirtualPowerGrid.cities:
-    plt1 = []
-    for consumer in city.consumerList:
-        # Draw plot
-        if len(consumer.consumerGeneratedEnergyGraphPoints) > 0:
-            plt1 = plt.plot(np.arange(0, SIM_TIME), consumer.consumerGeneratedEnergyGraphPoints,
-                            color=pick_random_color())
-            plt.xlabel("Hour of day")
-            plt.ylabel("Consumer Generation")
-    plt1[0].set_label(f"city {city.cityNumber}")
-plt.legend()
-plt.show()
-
-plt.figure(figsize=(20, 10))
-# Draw windturbine energy generation
-plt.plot(np.arange(0, SIM_TIME), WindTurbineEnergyGeneration, color='tab:red', label='Wind Turbine')
-plt.xlabel("Hour of day")
-plt.ylabel("Windturbine Generation")
-plt.legend()
-plt.show()
-
-plt.figure(figsize=(20, 10))
-# Cities Bar plot
-for city in VirtualPowerGrid.cities:
-    cityEnergyGeneration = 0
-    cityEnergyConsumption = 0
-    for consumer in city.consumerList:
-        cityEnergyConsumption += np.sum(consumer.consumerConsumptionEnergyGraphPoints)
-        cityEnergyGeneration += np.sum(consumer.consumerGeneratedEnergyGraphPoints)
-    plt.bar(city.cityNumber, cityEnergyConsumption, 0.8, color='r', alpha=0.3)
-    plt.bar(city.cityNumber, cityEnergyGeneration, 0.8, color='g', alpha=0.4)
-plt.xlabel("Cities")
-plt.ylabel("Energy Level")
-redLabel = pa.Patch(color='r', label='Energy consumption')
-greenLabel = pa.Patch(color='g', label='Energy Generation')
-plt.legend(handles=[redLabel, greenLabel])
-plt.show()
+if os.path.exists("plots/output.json"):
+    os.remove("plots/output.json")
+f = open("plots/output.json", "a")
+f.write(output)
+f.close()

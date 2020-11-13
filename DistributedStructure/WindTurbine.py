@@ -12,6 +12,8 @@ class WindTurbine(object):
         self.log = weather_history.WeatherLog(file_path)
         self.online = True
 
+        # Total amount produced by this wind turbine
+        self.totalProduced = 0
 
     # https://www.ajdesigner.com/phpwindpower/wind_generator_power_performance_coefficient.php
     # Info about the below variables and their typical values
@@ -36,4 +38,6 @@ class WindTurbine(object):
     def power(self, datetime):
         power = 0.5 * self.p * self.A * self.Cp * pow(
             self.log.get_wind_speed(datetime), 3) * self.Ng * self.Nb
-        return power / 10000
+        power = power / 10000
+        self.totalProduced += power
+        return power
