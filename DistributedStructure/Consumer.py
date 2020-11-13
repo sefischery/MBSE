@@ -27,7 +27,10 @@ batteryEnergyEfficiency = 0.75 # 25 % Loss
 
 listOfConsumers = [RegularConsumerHourly, NightConsumerHourly, HomeConsumerHourly, HighUsageConsumerHourly]
 
-listOfResources = [None, 'solarCell', 'solarCell', 'solarCell']
+# The rate houses have solar cells. 0.75 = 75% solar cells
+SOLAR_CELL_RATE = 0.75
+# Defines minimum and maximum solar cell size
+SOLAR_CELL_SIZE = [15, 40]
 
 
 class Consumer(object):
@@ -82,10 +85,6 @@ class Consumer(object):
     def set_resource(self, resource):
         self.resource = resource
 
-    def set_resource_size(self, size):
-        if self.resource is not None:
-            self.resource.set_squaremeter_size(size)
-
     def process_city_energy_grid(self, cityNumber, battery):
         energy = self.generatedEnergyTick - self.consumedEnergyTick
         if energy > 0:
@@ -105,9 +104,9 @@ def select_random_consumer_type():
     return random.choice(list(listOfConsumers_dict.keys()))
 
 
-def select_random_resource_type():
-    resource = random.choice(listOfResources)
-    if resource == 'solarCell':
-        return SolarCell()
+def random_solar_cell():
+    if random.random() < SOLAR_CELL_RATE:
+        size = random.uniform(*SOLAR_CELL_SIZE)
+        return SolarCell(size)
 
     return None

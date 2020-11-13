@@ -3,7 +3,7 @@ import random
 import simpy
 
 from DistributedStructure.City import City
-from DistributedStructure.Consumer import Consumer, select_random_consumer_type, select_random_resource_type
+from DistributedStructure.Consumer import Consumer, select_random_consumer_type, random_solar_cell
 from DistributedStructure.WindTurbine import WindTurbine
 
 days = 2
@@ -116,9 +116,7 @@ VirtualPowerGrid.set_resources(Windturbines)
 for city in VirtualPowerGrid.cities:
     consumers = [Consumer(env, select_random_consumer_type(), i) for i in range(random.randint(10, 20))]
     for consumer in consumers:
-        resource = select_random_resource_type()
-        consumer.set_resource(resource)  # Set generation resource
-        consumer.set_resource_size(random.uniform(15, 40))  # set size of resource
+        consumer.set_resource(random_solar_cell())  # Set generation resource
         city.add_consumer(consumer)
 
     batteryCapacity = len(city.consumerList) * 5000
