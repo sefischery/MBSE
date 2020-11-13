@@ -40,14 +40,15 @@ class Consumer(object):
         self.env = env
         self.houseNumber = houseNumber
         self.type = type
+        self.typeGenerationList = listOfConsumers_dict.get(self.type)
 
         # Dynamic variables
-        self.consumedEnergy = 0
-        self.generatedEnergy = 0
+        self.consumedEnergyTotal = 0
+        self.generatedEnergyTotal = 0
 
         # Plots
-        self.consumerGeneratedEnergyGraphPoints = []
-        self.consumerConsumptionEnergyGraphPoints = []
+        self.consumedEnergyHistory = []
+        self.generatedEnergyHistory = []
 
         self.consumedEnergyTick = 0
         self.generatedEnergyTick = 0
@@ -64,12 +65,14 @@ class Consumer(object):
         while True:
             fluctuation = random.uniform(-0.0075, 0.0075)
 
-            typeList = listOfConsumers_dict.get(self.type)
-            energyConsumption = DAILY_USAGE * (typeList[self.env.now % 24] + fluctuation)
+            hour_of_day = self.env.now % 24
+            energyConsumed = DAILY_USAGE * (self.typeGenerationList[hour_of_day] + fluctuation)
 
-            self.consumedEnergy += energyConsumption
-            self.consumedEnergyTick = energyConsumption
-            self.consumerConsumptionEnergyGraphPoints.append(energyConsumption)
+            self.consumedEnergyTick = energyConsumed
+
+            self.consumedEnergyTotal += energyConsumed
+            self.consumedEnergyHistory.append([self.env.now, energyConsumed])
+
             yield self.env.timeout(1)
 
     def generate_resource_energy(self):
@@ -77,9 +80,11 @@ class Consumer(object):
         if self.resource is not None:
             while True:
                 energyGenerated = self.resource.power(date_utc)
-                self.generatedEnergy += energyGenerated
                 self.generatedEnergyTick = energyGenerated
-                self.consumerGeneratedEnergyGraphPoints.append(energyGenerated)
+
+                self.generatedEnergyTotal += energyGenerated
+                self.generatedEnergyHistory.append([self.env.now, energyGenerated])
+
                 date_utc += datetime.timedelta(hours=1)
                 yield self.env.timeout(1)
 
@@ -88,6 +93,7 @@ class Consumer(object):
 
     def process_city_energy_grid(self, cityNumber, battery):
         energy = self.generatedEnergyTick - self.consumedEnergyTick
+
         if energy > 0:
             battery.put(energy * batteryEnergyEfficiency) # Give energy to city battery
 
@@ -99,6 +105,16 @@ class Consumer(object):
             self.cityBatteryUsage += energy
             battery.get(energy) # Take energy from city battery
         yield self.env.timeout(1)
+
+    def getResults(self):
+        return {
+            "consumedEnergyTotal": self.consumedEnergyTotal,
+            "consumedEnergyHistory": self.consumedEnergyHistory,
+            "generatedEnergyTotal": self.generatedEnergyTotal,
+            "generatedEnergyHistory": self.generatedEnergyHistory,
+            "cityBatteryUsage": self.cityBatteryUsage,
+            "type": self.type
+        }
 
 
 def select_random_consumer_type():
