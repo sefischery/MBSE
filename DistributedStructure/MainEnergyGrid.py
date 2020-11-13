@@ -118,7 +118,6 @@ for city in VirtualPowerGrid.cities:
     for consumer in consumers:
         resource = select_random_resource_type()
         consumer.set_resource(resource)  # Set generation resource
-        consumer.set_resource_size(random.uniform(15, 40))  # set size of resource
         city.add_consumer(consumer)
 
     batteryCapacity = len(city.consumerList) * 5000
