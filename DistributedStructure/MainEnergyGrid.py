@@ -121,7 +121,7 @@ for city in VirtualPowerGrid.cities:
 
     batteryCapacity = len(city.consumerList) * 5000
     cityBatteryContainer = simpy.Container(env, batteryCapacity, init=batteryCapacity) #0.35 * batteryCapacity)
-    city.add_battery(cityBatteryContainer)
+    city.set_battery(cityBatteryContainer)
 
 # Execute!
 env.run(until=SIM_TIME)
