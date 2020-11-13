@@ -3,6 +3,7 @@ import numpy as np
 import random
 
 from DistributedStructure.SolarCell import SolarCell
+from constants import *
 
 DAILY_USAGE = 4488  # Watt
 
@@ -75,16 +76,16 @@ class Consumer(object):
             yield self.env.timeout(1)
 
     def generate_resource_energy(self):
-        date = datetime.datetime(2019, 1, 1, 0)
+        date_utc = datetime.datetime(START_YEAR, START_MONTH, START_DAY, START_HOUR)
         if self.resource is not None:
             while True:
-                energyGenerated = self.resource.power(date)
+                energyGenerated = self.resource.power(date_utc)
                 self.generatedEnergyTick = energyGenerated
 
                 self.generatedEnergyTotal += energyGenerated
                 self.generatedEnergyHistory.append([self.env.now, energyGenerated])
 
-                date += datetime.timedelta(hours=1)
+                date_utc += datetime.timedelta(hours=1)
                 yield self.env.timeout(1)
 
     def set_resource(self, resource):

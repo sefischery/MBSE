@@ -21,7 +21,7 @@ class SolarCell(object):
         
         self.online = True
 
-    def power(self, datetime):
-        power_generated =  self.log.get_solar_rad(datetime) * self.efficiency * self.squaremeters
+    def power(self, datetime_utc):
+        power_generated =  self.log.get_solar_rad(weather_history.utc_to_danish_time(datetime_utc)) * self.efficiency * self.squaremeters
         self.totalProduces += power_generated
         return power_generated

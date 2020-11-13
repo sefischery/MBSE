@@ -1,11 +1,12 @@
 import pandas as pd
 import datetime
+import pytz
 
 
 class WeatherLog:
     def __init__(self, csv_path):
         self.dataFrame = pd.read_csv(csv_path, sep=';',
-                                     index_col="timestamp_utc")
+                                     index_col="timestamp_local")
 
     def get_solar_rad(self, time):
         solar_before = self.dataFrame.loc[
@@ -33,9 +34,6 @@ class WeatherLog:
     def _datetime_to_key_string(dt):
         return dt.strftime("%Y-%m-%dT%H:00:00")
 
-# log = WeatherLog("weather_copenhagen.csv")
-
-# date = datetime.datetime(2019, 1, 1, 11, 30)
-# print(log.get_solar_rad(date))
-# print(log.get_wind_speed(date))
-# print(type(log.get_solar_rad(date)))
+danish_timezone = pytz.timezone('Europe/Copenhagen')
+def utc_to_danish_time(date):
+    return date.replace(tzinfo=pytz.utc).astimezone(danish_timezone)
