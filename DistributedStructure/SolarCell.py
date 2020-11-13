@@ -18,9 +18,8 @@ class SolarCell(object):
 
         # Keep the efficiency of the individuel solar cell constant
         self.efficiency = random.uniform(0.175, 0.225)
-
-    def __repr__(self):
-        return '{}({})'.format(self.__class__.__name__, self.id)
+        
+        self.online = True
 
     def power(self, datetime):
         power_generated =  self.log.get_solar_rad(datetime) * self.efficiency * self.squaremeters
