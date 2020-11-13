@@ -37,8 +37,3 @@ class WeatherLog:
 danish_timezone = pytz.timezone('Europe/Copenhagen')
 def utc_to_danish_time(date):
     return date.replace(tzinfo=pytz.utc).astimezone(danish_timezone)
-
-
-danish_timezone = pytz.timezone('Europe/Copenhagen')
-def utc_to_danish_time(date):
-    return date.replace(tzinfo=pytz.utc).astimezone(danish_timezone)
