@@ -1,3 +1,5 @@
+import json
+
 batteryEnergyEfficiency = 0.75 # Battery charging loss
 
 
@@ -14,7 +16,7 @@ class City(object):
         # Start process
         env.process(self.overwatch_consumer())
 
-    def add_battery(self, battery):
+    def set_battery(self, battery):
         self.battery = battery
 
     def add_consumer(self, consumer):
@@ -39,3 +41,10 @@ class City(object):
                 energy -= energy
 
         return energy
+
+
+    def getResults(self):
+        return {
+            "city_number": self.cityNumber,
+            "consumers": list(map(lambda x: x.getResults(), self.consumerList))
+        }

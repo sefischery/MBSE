@@ -1,0 +1,3 @@
+python plots/consumer_generated_energy.py
+python plots/windturbine_generated_energy.py
+python plots/city_bar_plot.py

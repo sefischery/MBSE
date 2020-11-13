@@ -4,3 +4,5 @@
 /Lib
 /Scripts
 pyvenv.cfg
+output.json
+plots/output.json
