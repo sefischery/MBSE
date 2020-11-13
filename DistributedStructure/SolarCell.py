@@ -8,8 +8,7 @@ file_path = (base_path / "../weather_copenhagen.csv").resolve()
 
 # SOLAR CELL
 class SolarCell(object):
-    SOLAR_OUTPUT_PER_SECOND = 137
-
+    
     def __init__(self, squaremeters_size):
         self.log = weather_history.WeatherLog(file_path)
         self.squaremeters = squaremeters_size
