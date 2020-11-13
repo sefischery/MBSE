@@ -35,7 +35,7 @@ class EnergyGrid(object):
         env.process(self.overwatch_cities())
         env.process(self.overwatch_resource_battery())
 
-    def add_battery(self, battery):
+    def set_battery(self, battery):
         self.resourceBattery = battery
 
     def set_cities(self, cities):
@@ -190,7 +190,7 @@ VirtualPowerGrid.set_resources(Windturbines)
 # Add resource battery
 capatity = NUMB_OF_WINDTURBINES * 50000
 windturbineBatteryContainer = simpy.Container(env, capatity, init=capatity * 0.85)
-VirtualPowerGrid.add_battery(windturbineBatteryContainer)
+VirtualPowerGrid.set_battery(windturbineBatteryContainer)
 
 # Add Consumers & Battery to Cities
 for city in VirtualPowerGrid.cities:
@@ -201,7 +201,7 @@ for city in VirtualPowerGrid.cities:
 
     batteryCapacity = len(city.consumerList) * 10000
     cityBatteryContainer = simpy.Container(env, batteryCapacity, init=batteryCapacity * 0.7) #0.35 * batteryCapacity)
-    city.add_battery(cityBatteryContainer)
+    city.set_battery(cityBatteryContainer)
 
 # Execute!
 env.run(until=SIM_TIME)
