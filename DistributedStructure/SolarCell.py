@@ -14,8 +14,5 @@ class SolarCell(object):
         self.squaremeters = squaremeters_size
         self.online = True
 
-    def __repr__(self):
-        return '{}({})'.format(self.__class__.__name__, self.id)
-
     def power(self, datetime):
         return self.log.get_solar_rad(datetime) * random.uniform(0.175, 0.225) * self.squaremeters
