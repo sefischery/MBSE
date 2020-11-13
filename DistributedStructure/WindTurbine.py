@@ -3,7 +3,7 @@ from weather import weather_history
 import numpy as np
 
 base_path = Path(__file__).parent
-file_path = (base_path / "../weather/weather_copenhagen.csv").resolve()
+file_path = (base_path / "../weather/data/2019/weather_copenhagen.csv").resolve()
 
 
 class WindTurbine(object):
