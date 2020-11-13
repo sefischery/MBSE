@@ -9,8 +9,8 @@ def gather_weather_json(start_datetime, end_datetime):
     start_date = start_datetime.strftime(date_format)
     end_date = end_datetime.strftime(date_format)
 
-    api_key = "3005becb7e874467b183c6d4158ad28b" 
-    # api_key = "d3493c8dbeb448fbbe804c07a1b11a7b" #Adams key
+    # api_key = "3005becb7e874467b183c6d4158ad28b" 
+    api_key = "d3493c8dbeb448fbbe804c07a1b11a7b" #Adams key
     
     #Lyngby
     # latitude = "55.784"
@@ -21,16 +21,16 @@ def gather_weather_json(start_datetime, end_datetime):
     # longitude = "10.201"
 
     #Aalborg
-    # latitude = "57.046"
-    # longitude = "9.931"
+    latitude = "57.046"
+    longitude = "9.931"
 
     #Kolding
     # latitude = "55.491"
     # longitude = "9.474"
 
     #Odense
-    latitude = "55.396"
-    longitude = "10.382"
+    # latitude = "55.396"
+    # longitude = "10.382"
 
 
     frequency = "hourly"
@@ -57,7 +57,7 @@ def gather_weather_json(start_datetime, end_datetime):
 
     return jsonResponse
 
-start_datetime = datetime.datetime(2019, 1, 1)
+start_datetime = datetime.datetime(2018, 1, 1)
 #dataframe = pd.read_csv("weather.csv", sep=';')
 dataframe = pd.DataFrame()
 
@@ -72,7 +72,7 @@ for i in range(365):
 
 
 
-dataframe.to_csv('weather_odense.csv', sep=';')
+dataframe.to_csv('weather/data/2018/weather_aalborg.csv', sep=';')
 
 
 
