@@ -4,10 +4,12 @@ import numpy as np
 import random
 import json
 
+
 with open("../plots/output.json", "r") as f:
-  VirtualPowerGrid = json.load(f)
+    VirtualPowerGrid = json.load(f)
 
 sns.set_theme()
+
 
 def pick_random_color():
     r = random.random()
