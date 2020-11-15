@@ -36,7 +36,7 @@ class WindTurbine(object):
     Nb = 0.95
 
     def power(self, datetime_utc):
-        wind_speed = self.log.get_wind_speed(weather_history.utc_to_danish_time(datetime_utc))
+        wind_speed = self.log.get_wind_speed_from_utc(datetime_utc)
         if(wind_speed < 4 or wind_speed > 25):
             power = 0
         else:
