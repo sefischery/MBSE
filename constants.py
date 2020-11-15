@@ -9,6 +9,7 @@ START_HOUR = 1              #                                       STATIC DON'T
 
 WING_SIZE = [20, 80]        # Size span of wind turbines
 
+BATTERY_ENERGY_EFFICIENCY = 0.75  # STATIC DON'T TOUCH
 
 DAILY_USAGE = 4488          # Watt                                                      STATIC DON'T TOUCH
 SOLAR_CELL_RATE = 0.75      # The rate houses have solar cells. 0.75 = 75% solar cells  STATIC DON'T TOUCH

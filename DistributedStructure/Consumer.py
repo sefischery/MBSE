@@ -23,8 +23,6 @@ listOfConsumers_dict = {
     "HighUsageConsumer": HighUsageConsumerHourly
 }
 
-batteryEnergyEfficiency = 0.75 # 25 % Loss
-
 listOfConsumers = [RegularConsumerHourly, NightConsumerHourly, HomeConsumerHourly, HighUsageConsumerHourly]
 
 
@@ -43,6 +41,10 @@ class Consumer(object):
         # Plots
         self.consumedEnergyHistory = []
         self.generatedEnergyHistory = []
+
+        # Outages and overloads
+        self.outages = []
+        self.overloads = []
 
         self.consumedEnergyTick = 0
         self.generatedEnergyTick = 0
@@ -94,15 +96,28 @@ class Consumer(object):
             exit()
 
         if energy > 0:
-            battery.put(energy * batteryEnergyEfficiency) # Give energy to city battery
+            energy = energy * BATTERY_ENERGY_EFFICIENCY
+
+            if battery.capacity - battery.level < energy:
+                # Overload of battery
+                energy = battery.capacity - battery.level
+                self.overloads.append(self.env.now)
+
+            if energy > 0:
+                battery.put(energy) # Give energy to city battery
 
         elif energy < 0:
             energy = abs(energy)
-            #if energy > battery.level: # House will experience power outage
-                #print(f"Power outage in city: {cityNumber}; house: {self.houseNumber}")
 
-            self.cityBatteryUsage += energy
-            battery.get(energy) # Take energy from city battery
+            if energy > battery.level:
+                # Outage of customer
+                energy = battery.level
+                self.outages.append(self.env.now)
+
+            if energy > 0:
+                self.cityBatteryUsage += energy
+                battery.get(energy) # Take energy from city battery
+
         yield self.env.timeout(1)
 
     def getResults(self):
@@ -112,7 +127,9 @@ class Consumer(object):
             "generatedEnergyTotal": self.generatedEnergyTotal,
             "generatedEnergyHistory": self.generatedEnergyHistory,
             "cityBatteryUsage": self.cityBatteryUsage,
-            "type": self.type
+            "type": self.type,
+            "overloads": self.overloads,
+            "outages": self.outages
         }
 
 
