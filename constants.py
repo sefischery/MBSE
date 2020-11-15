@@ -3,7 +3,7 @@ SIM_TIME = 24 * DAYS        # Hours                                 STATIC DON'T
 NUMB_OF_CITIES = 5          # Number of cities                      STATIC DON'T TOUCH
 NUMB_OF_WINDTURBINES = 6    # Number of windturbines in our grid.
 START_YEAR = 2019           #                                       STATIC DON'T TOUCH
-START_MONTH = 6             #                                       STATIC DON'T TOUCH
+START_MONTH = 1             #                                       STATIC DON'T TOUCH
 START_DAY = 1               #                                       STATIC DON'T TOUCH
 START_HOUR = 1              #                                       STATIC DON'T TOUCH
 
