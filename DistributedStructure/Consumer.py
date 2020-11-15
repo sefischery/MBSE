@@ -23,8 +23,6 @@ listOfConsumers_dict = {
     "HighUsageConsumer": HighUsageConsumerHourly
 }
 
-batteryEnergyEfficiency = 0.75 # 25 % Loss
-
 listOfConsumers = [RegularConsumerHourly, NightConsumerHourly, HomeConsumerHourly, HighUsageConsumerHourly]
 
 
@@ -98,7 +96,7 @@ class Consumer(object):
             exit()
 
         if energy > 0:
-            energy = energy * batteryEnergyEfficiency
+            energy = energy * BATTERY_ENERGY_EFFICIENCY
 
             if battery.capacity - battery.level < energy:
                 # Overload of battery
