@@ -88,6 +88,11 @@ class Consumer(object):
     def process_city_energy_grid(self, cityNumber, battery):
         energy = self.generatedEnergyTick - self.consumedEnergyTick
 
+        if type(energy) != float and type(energy) != np.float64:
+            print(f"generatedEnergyTick: {self.generatedEnergyTick}, consumedEnergyTick: {self.consumedEnergyTick}")
+            print(f"energy type: {type(energy)}, energy: {energy}")
+            exit()
+
         if energy > 0:
             battery.put(energy * batteryEnergyEfficiency) # Give energy to city battery
 
