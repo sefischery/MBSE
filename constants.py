@@ -8,3 +8,5 @@ START_DAY = 1
 START_HOUR = 1
 
 WING_SIZE = [20, 80]        # Size span of wind turbines
+
+WIND_TURBINE_LIFESPAN_HOURS = 1200000

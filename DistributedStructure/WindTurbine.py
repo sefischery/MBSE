@@ -1,6 +1,7 @@
 from pathlib import Path
 from weather import weather_history
 import numpy as np
+import constants
 
 base_path = Path(__file__).parent
 file_path = (base_path / "../weather/data/2019/weather_copenhagen.csv").resolve()
@@ -11,6 +12,7 @@ class WindTurbine(object):
         self.A = pow(wing_size, 2) * np.pi
         self.log = weather_history.WeatherLog(file_path)
         self.online = True
+        self.lifespan_left = constants.WIND_TURBINE_LIFESPAN_HOURS
 
         # Total amount produced by this wind turbine
         self.totalProduced = 0
@@ -40,4 +42,5 @@ class WindTurbine(object):
             self.log.get_wind_speed(weather_history.utc_to_danish_time(datetime_utc)), 3) * self.Ng * self.Nb
         power = power / 10000
         self.totalProduced += power
+        self.lifespan_left -= 1
         return power
