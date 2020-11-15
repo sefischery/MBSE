@@ -115,15 +115,15 @@ class EnergyGrid(object):
                         if surPlusEnergy < neededEnergy:
                             neededEnergy -= surPlusEnergy
                             supportiveCity.battery.get(surPlusEnergy)
-                            criticalCity.battery.put(surPlusEnergy)
+                            criticalCity.battery.put(surPlusEnergy * INTER_CITY_TRANSMISSION_EFFICIENCY)
                             print(
                                 f"City {supportiveCity.cityNumber}, sends energy level {surPlusEnergy}, to city {criticalCity.cityNumber}")
                         else:
                             supportiveCity.battery.get(neededEnergy)
-                            criticalCity.battery.put(neededEnergy)
+                            criticalCity.battery.put(neededEnergy * INTER_CITY_TRANSMISSION_EFFICIENCY)
                             print(
                                 f"City {supportiveCity.cityNumber}, sends energy level {neededEnergy}, to city {criticalCity.cityNumber}")
-                            neededEnergy -= neededEnergy
+                            neededEnergy -= neededEnergy * INTER_CITY_TRANSMISSION_EFFICIENCY
 
         yield self.env.timeout(1)
 
@@ -146,7 +146,7 @@ class EnergyGrid(object):
     def distribute_generated_energy(self):
         while True:
             if self.resourceGeneratedEnergy > 0:
-                energyLevelToDistribute = self.resourceGeneratedEnergy / len(self.cities)
+                energyLevelToDistribute = (self.resourceGeneratedEnergy / len(self.cities)) * WIND_TURBINE_TRANSMISSION_EFFICIENCY
                 for city in self.cities:
                     remainingEnergy = city.process_incoming_energy(energyLevelToDistribute)
                     self.fill_resource_battery(remainingEnergy)

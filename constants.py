@@ -8,3 +8,6 @@ START_DAY = 1
 START_HOUR = 1
 
 WING_SIZE = [20, 80]        # Size span of wind turbines
+
+INTER_CITY_TRANSMISSION_EFFICIENCY = 0.94       # 6% loss
+WIND_TURBINE_TRANSMISSION_EFFICIENCY = 0.94     # 6% loss
