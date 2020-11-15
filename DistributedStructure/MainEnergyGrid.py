@@ -144,13 +144,52 @@ class EnergyGrid(object):
             yield self.env.timeout(1)
 
     def distribute_generated_energy(self):
+        #while True:
+        #    if self.resourceGeneratedEnergy > 0:
+        #        energyLevelToDistribute = self.resourceGeneratedEnergy / len(self.cities)
+        #        for city in self.cities:
+        #            remainingEnergy = city.process_incoming_energy(energyLevelToDistribute)
+        #            self.fill_resource_battery(remainingEnergy)
+        #    yield self.env.timeout(1)
         while True:
             if self.resourceGeneratedEnergy > 0:
-                energyLevelToDistribute = self.resourceGeneratedEnergy / len(self.cities)
+                criticalCities = []
+                remainingCities = []
+                print(f"Total available resource generated energy: {self.resourceGeneratedEnergy}")
                 for city in self.cities:
-                    remainingEnergy = city.process_incoming_energy(energyLevelToDistribute)
-                    self.fill_resource_battery(remainingEnergy)
+                    if city.battery.level / city.battery.capacity < 0.25:  # less than 25 % of battery's capacity, then it's a critical city
+                        criticalCities.append(city)
+                    else:     #Rest of the cities
+                        remainingCities.append(city)
+                for city in criticalCities:    # Start with the critical cities
+                    neededEnergy = city.battery.capacity - city.battery.level    #The nergy the city needs
+                    if self.resourceGeneratedEnergy > neededEnergy:    # If there is enough generated energy to support the battery
+                        city.process_incoming_energy(neededEnergy)
+                        print(f"Wind turbine sending {neededEnergy} to critical city {city.cityNumber}")
+                        self.resourceGeneratedEnergy -= neededEnergy
+                        print(f"Reamining resource generated energy: {self.resourceGeneratedEnergy}")
+                    else:    # Send alle the remaining energy to that city
+                        city.process_incoming_energy(self.resourceGeneratedEnergy)
+                        print(f"Wind turbine sending {self.resourceGeneratedEnergy} to critical city {city.cityNumber}")
+                        self.resourceGeneratedEnergy = 0
+                        print(f"Reamining resource generated energy: {self.resourceGeneratedEnergy}")
+                        break
+                for city in remainingCities:   # Continue with the remaining cities
+                    neededEnergy = city.battery.capacity - city.battery.level
+                    if self.resourceGeneratedEnergy > neededEnergy:  # If there is enough generated energy to support the battery
+                        city.process_incoming_energy(neededEnergy)
+                        print(f"Wind turbine sending {neededEnergy} to city {city.cityNumber}")
+                        self.resourceGeneratedEnergy -= neededEnergy
+                        print(f"Reamining resource generated energy: {self.resourceGeneratedEnergy}")
+                    else:   # Send alle the remaining energy to that city
+                        city.process_incoming_energy(self.resourceGeneratedEnergy)
+                        print(f"Wind turbine sending {self.resourceGeneratedEnergy} to city {city.cityNumber}")
+                        self.resourceGeneratedEnergy = 0
+                        print(f"Reamining resource generated energy: {self.resourceGeneratedEnergy}")
+                        break
             yield self.env.timeout(1)
+
+
 
     def fill_resource_battery(self, energy):
         if energy > 0:
@@ -226,8 +265,8 @@ output = json.dumps({
 })
 #print (output)
 
-if os.path.exists("../plots/output.json"):
-    os.remove("../plots/output.json")
-f = open("../plots/output.json", "a")
+if os.path.exists("plots/output.json"):
+    os.remove("plots/output.json")
+f = open("plots/output.json", "a")
 f.write(output)
 f.close()
