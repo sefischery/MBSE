@@ -21,12 +21,12 @@ def gather_weather_json(start_datetime, end_datetime):
     # longitude = "10.201"
 
     #Aalborg
-    latitude = "57.046"
-    longitude = "9.931"
+    # latitude = "57.046"
+    # longitude = "9.931"
 
     #Kolding
-    # latitude = "55.491"
-    # longitude = "9.474"
+    latitude = "55.491"
+    longitude = "9.474"
 
     #Odense
     # latitude = "55.396"
@@ -72,7 +72,7 @@ for i in range(365):
 
 
 
-dataframe.to_csv('weather/data/2018/weather_aalborg.csv', sep=';')
+dataframe.to_csv('weather/data/2018/weather_kolding.csv', sep=';')
 
 
 
