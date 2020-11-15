@@ -5,7 +5,6 @@ import random
 from DistributedStructure.SolarCell import SolarCell
 from constants import *
 
-DAILY_USAGE = 4488  # Watt
 
 RegularConsumerHourly = [0.03303964757709271, 0.022026431718061677, 0.02026431718061674, 0.022026431718061675,
                          0.02026431718061674, 0.03436123348017621, 0.04229074889867841, 0.04317180616740088,
@@ -27,11 +26,6 @@ listOfConsumers_dict = {
 batteryEnergyEfficiency = 0.75 # 25 % Loss
 
 listOfConsumers = [RegularConsumerHourly, NightConsumerHourly, HomeConsumerHourly, HighUsageConsumerHourly]
-
-# The rate houses have solar cells. 0.75 = 75% solar cells
-SOLAR_CELL_RATE = 0.75
-# Defines minimum and maximum solar cell size
-SOLAR_CELL_SIZE = [15, 40]
 
 
 class Consumer(object):
