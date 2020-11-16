@@ -26,8 +26,8 @@ mpl.rcParams['axes.prop_cycle'] = mpl.cycler(color=colors)
 # Data
 power_generation = []
 power_consumption = []
-power_receive = [100000, 100000, 100000, 100000, 100000, 100000]
-power_transmit = [100000, 100000, 100000, 100000, 100000, 100000]
+power_receive = [100000, 200000, 300000, 400000, 500000, 600000]
+power_transmit = [600000, 500000, 400000, 300000, 200000, 100000]
 for city in VirtualPowerGrid["cities"]:
     power_generated = 0
     power_consumed = 0
@@ -44,8 +44,7 @@ for city in VirtualPowerGrid["cities"]:
 # Plot metrics
 index = np.arange(len(VirtualPowerGrid["cities"]))
 xtick_labels = [f'City {i + 1}' for i in index]
-print(xtick_labels)
-bar_width = 0.35
+bar_width = 0.175
 opacity = 1
 
 # Plot
@@ -58,7 +57,7 @@ plt.xlabel('Cities')
 plt.ylabel('Power [kW]')
 plt.title('Total power production/consumption for all cities', fontsize=16)
 plt.xticks(index + bar_width * 1.5, xtick_labels, fontsize=10)
-ax.set_yticklabels((0, 500, 1000, 1500, 2000, 2500, 3000))    # TODO: Make dynamic, i.e. not hardcoded
+plt.yticks(plt.yticks()[0], [int(i/1000) for i in plt.yticks()[0]], fontsize=10)
 plt.grid(True, which='both', color="#93a1a1", alpha=0.3)
 plt.legend(loc='best', fontsize=12)
 
