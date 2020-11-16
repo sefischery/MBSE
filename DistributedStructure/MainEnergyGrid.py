@@ -6,12 +6,32 @@ import json
 import os
 
 from DistributedStructure.City import City
-from DistributedStructure.Consumer import Consumer, select_random_consumer_type, random_solar_cell
+from DistributedStructure.Consumer import Consumer, select_random_consumer_type, \
+    random_solar_cell
 from DistributedStructure.WindTurbine import WindTurbine
 
 from constants import *
 
 WindTurbineEnergyGeneration = []
+
+
+def is_critical_city(city_):
+    return True if city_.battery.level / city_.battery.capacity < 0.25 else False
+
+
+def is_supportive_city(city_):
+    return True if city_.battery.level / city_.battery.capacity > 0.50 else False
+
+
+def find_critical_and_supportive_cities(city_list):
+    criticalCities = []
+    supportiveCities = []
+    for city_ in city_list:
+        if is_critical_city(city_):
+            criticalCities.append(city_)
+        elif is_supportive_city(city_):
+            supportiveCities.append(city_)
+    return criticalCities, supportiveCities
 
 
 class EnergyGrid(object):
@@ -42,15 +62,11 @@ class EnergyGrid(object):
 
     def overwatch_cities(self):
         while True:
-            criticalCities = []
-            supportiveCities = []
-            for city in self.cities:
-                if city.battery.level / city.battery.capacity < 0.25:  # less than 10 % of battery's capacity, then it's a critical city
-                    criticalCities.append(city)  # Critical cities
-                elif city.battery.level / city.battery.capacity > 0.50:  # if city has 20% or more of battery's capacity then it's a supportivecity.
-                    supportiveCities.append(city)  # Balanced city energy level
+            criticalCities, supportiveCities = find_critical_and_supportive_cities(self.cities)
             if len(criticalCities) > 0 and len(supportiveCities) > 0:
-                env.process(self.perform_city_energy_distribution(criticalCities, supportiveCities))
+                env.process(
+                    self.perform_city_energy_distribution(criticalCities,
+                                                          supportiveCities))
 
             # In case we still have critical cities, distribute energy from resource battery
             self.distribute_to_critical_city_from_resource_battery()
@@ -59,8 +75,9 @@ class EnergyGrid(object):
 
     def distribute_to_critical_city_from_resource_battery(self):
         for city in self.cities:
-            if city.battery.level / city.battery.capacity < 0.25:
-                neededEnergy = ((city.battery.capacity * 0.30) - city.battery.level)
+            if is_critical_city(city):
+                neededEnergy = (
+                        (city.battery.capacity * 0.30) - city.battery.level)
                 if self.resourceBattery.level > neededEnergy:
                     city.battery.put(neededEnergy)
                     self.resourceBattery.get(neededEnergy)
@@ -161,7 +178,7 @@ class EnergyGrid(object):
                 remainingCities = []
                 #print(f"Total available resource generated energy: {self.resourceGeneratedEnergy}")
                 for city in self.cities:
-                    if city.battery.level / city.battery.capacity < 0.25:  # less than 25 % of battery's capacity, then it's a critical city
+                    if is_critical_city(city):
                         criticalCities.append(city)
                     else:  # Rest of the cities
                         remainingCities.append(city)
