@@ -6,3 +6,5 @@
 pyvenv.cfg
 output.json
 plots/output.json
+/venv
+/__pycache__
