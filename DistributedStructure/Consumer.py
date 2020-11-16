@@ -45,13 +45,19 @@ class Consumer(object):
         # Dynamic variables
         self.consumedEnergyTotal = 0
         self.generatedEnergyTotal = 0
+        self.receivedEnergyTotal = 0
+        self.transmittedEnergyTotal = 0
 
         # Plots
         self.consumedEnergyHistory = []
         self.generatedEnergyHistory = []
+        self.receivedEnergyHistory = []
+        self.transmittedEnergyHistory = []
 
         self.consumedEnergyTick = 0
         self.generatedEnergyTick = 0
+        self.receivedEnergyTick = 0
+        self. transmittedEnergyTick = 0
 
         self.resource = None
 
@@ -112,6 +118,10 @@ class Consumer(object):
             "consumedEnergyHistory": self.consumedEnergyHistory,
             "generatedEnergyTotal": self.generatedEnergyTotal,
             "generatedEnergyHistory": self.generatedEnergyHistory,
+            "receivedEnergyTotal": self.receivedEnergyTotal,
+            "receivedEnergyHistory": self.receivedEnergyHistory,
+            "transmittedEnergyTotal": self.transmittedEnergyTotal,
+            "transmittedEnergyHistory": self.transmittedEnergyHistory,
             "cityBatteryUsage": self.cityBatteryUsage,
             "type": self.type
         }

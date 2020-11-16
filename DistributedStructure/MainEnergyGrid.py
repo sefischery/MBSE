@@ -125,6 +125,17 @@ class EnergyGrid(object):
                                 f"City {supportiveCity.cityNumber}, sends energy level {neededEnergy}, to city {criticalCity.cityNumber}")
                             neededEnergy -= neededEnergy
 
+        # Create json
+        output2 = json.dumps({
+            'supportive_city': supportiveCities,
+            'energy_sent': neededEnergy
+        })
+        if os.path.exists("../plots/output2.json"):
+            os.remove("../plots/output2.json")
+        f = open("../plots/output2.json", "a")
+        f.write(output2)
+        f.close()
+
         yield self.env.timeout(1)
 
     def get_generated_energy(self):
@@ -220,11 +231,12 @@ print(f"Total windturbine energy generate: {VirtualPowerGrid.totalEnergyGenerate
 
 print(f"End Windturbine battery level: {VirtualPowerGrid.resourceBattery.level}, max capacity: {VirtualPowerGrid.resourceBattery.capacity}")
 output = json.dumps({
-    "cities": list(map(lambda x: x.getResults(),VirtualPowerGrid.cities)),
+    "cities": list(map(lambda x: x.getResults(), VirtualPowerGrid.cities)),
     "sim_time": SIM_TIME,
     "wind_turbine_generation_history": WindTurbineEnergyGeneration
 })
-#print (output)
+
+
 
 if os.path.exists("../plots/output.json"):
     os.remove("../plots/output.json")
