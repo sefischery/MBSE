@@ -141,17 +141,6 @@ class EnergyGrid(object):
                                 f"City {supportiveCity.cityNumber}, sends energy level {neededEnergy}, to city {criticalCity.cityNumber}")
                             neededEnergy -= neededEnergy
 
-        # Create json
-        output2 = json.dumps({
-            'supportive_city': supportiveCities,
-            'energy_sent': neededEnergy
-        })
-        if os.path.exists("../plots/output2.json"):
-            os.remove("../plots/output2.json")
-        f = open("../plots/output2.json", "a")
-        f.write(output2)
-        f.close()
-
         yield self.env.timeout(1)
 
     def get_generated_energy(self):
