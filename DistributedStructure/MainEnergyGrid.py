@@ -1,5 +1,4 @@
 import datetime
-import pytz
 import random
 import simpy
 import json
@@ -16,11 +15,11 @@ WindTurbineEnergyGeneration = []
 
 
 def is_critical_city(city_):
-    return True if city_.battery.level / city_.battery.capacity < 0.25 else False
+    return True if city_.battery.level / city_.battery.capacity < CRITICAL_CITY_PERCENTAGE else False
 
 
 def is_supportive_city(city_):
-    return True if city_.battery.level / city_.battery.capacity > 0.50 else False
+    return True if city_.battery.level / city_.battery.capacity > SUPPORTIVE_CITY_PERCENTAGE else False
 
 
 def find_critical_and_supportive_cities(city_list):
