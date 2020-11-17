@@ -1,11 +1,13 @@
 from constants import *
 
+
 class City(object):
     def __init__(self, env, cityNumber):
         # Input parameter initialized
         self.env = env
         self.cityNumber = cityNumber
-
+        # plot variable
+        self.city_battery_level_history = []
         # Dynamic
         self.consumerList = []
         self.battery = None
@@ -21,6 +23,8 @@ class City(object):
 
     def overwatch_consumer(self):
         while True:
+            self.city_battery_level_history.append(self.battery.level)
+
             for consumer in self.consumerList:
                 self.env.process(consumer.process_city_energy_grid(self.cityNumber, self.battery))
             yield self.env.timeout(1)
@@ -39,9 +43,9 @@ class City(object):
 
         return energy
 
-
     def getResults(self):
         return {
             "city_number": self.cityNumber,
-            "consumers": list(map(lambda x: x.getResults(), self.consumerList))
+            "consumers": list(map(lambda x: x.getResults(), self.consumerList)),
+            "city_battery_level": self.city_battery_level_history,
         }
