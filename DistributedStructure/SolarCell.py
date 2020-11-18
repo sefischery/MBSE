@@ -3,7 +3,7 @@ from pathlib import Path
 from weather import weather_history
 
 base_path = Path(__file__).parent
-file_path = (base_path / "../weather/data/2019/weather_copenhagen.csv").resolve()
+file_path = (base_path / "../weather/data/weather_copenhagen.csv").resolve()
 
 
 # SOLAR CELL
