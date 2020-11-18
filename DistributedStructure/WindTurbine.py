@@ -3,7 +3,7 @@ from weather import weather_history
 import numpy as np
 
 base_path = Path(__file__).parent
-file_path = (base_path / "../weather/data/2019/weather_copenhagen.csv").resolve()
+file_path = (base_path / "../weather/data/weather_copenhagen.csv").resolve()
 
 
 class WindTurbine(object):
@@ -36,8 +36,10 @@ class WindTurbine(object):
     Nb = 0.95
 
     def power(self, datetime_utc):
-        power = 0.5 * self.p * self.A * self.Cp * pow(
-            self.log.get_wind_speed(weather_history.utc_to_danish_time(datetime_utc)), 3) * self.Ng * self.Nb
-        power = power / 10000
+        wind_speed = self.log.get_wind_speed_from_utc(datetime_utc)
+        if(wind_speed < 4 or wind_speed > 25):
+            power = 0
+        else:
+            power = 0.5 * self.p * self.A * self.Cp * pow(wind_speed, 3) * self.Ng * self.Nb
         self.totalProduced += power
         return power

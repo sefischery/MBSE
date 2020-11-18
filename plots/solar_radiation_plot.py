@@ -11,10 +11,10 @@ file_path = (base_path / "../weather/data/2019/weather_copenhagen.csv").resolve(
 
 log = weather_history.WeatherLog(file_path)
 
-januar = datetime.datetime(2019, 1, 1, 0)
-april = datetime.datetime(2019, 4, 1, 0)
-july = datetime.datetime(2019, 7, 1, 0)
-october = datetime.datetime(2019, 10, 1, 0)
+januar = weather_history.utc_to_danish_time(datetime.datetime(2019, 1, 1, 0))
+april = weather_history.utc_to_danish_time(datetime.datetime(2019, 4, 1, 0))
+july = weather_history.utc_to_danish_time(datetime.datetime(2019, 7, 1, 0))
+october = weather_history.utc_to_danish_time(datetime.datetime(2019, 10, 1, 0))
 
 sns.set_theme()
 
@@ -25,7 +25,10 @@ plt.figure(figsize=(20, 10))
 sns.set(font_scale=5)
 plt.fill_between(np.arange(24),day_to_solar_rad_plot(july), color='g')
 plt.fill_between(np.arange(24),day_to_solar_rad_plot(april), color='b')
-plt.fill_between(np.arange(24),day_to_solar_rad_plot(october), color='y')
+october_data = day_to_solar_rad_plot(october)
+october_data[0] = 0.0
+october_data[-1] = 0.0
+plt.fill_between(np.arange(24),october_data, color='y')
 plt.fill_between(np.arange(24),day_to_solar_rad_plot(januar), color='r')
 plt.xlabel("Time of day [hour]")
 plt.ylabel("Solar radiation [W/sqm]")

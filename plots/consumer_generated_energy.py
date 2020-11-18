@@ -31,5 +31,7 @@ for city in VirtualPowerGrid["cities"]:
     plt.xlabel("Hour of day")
     plt.ylabel("Consumer Energy Generation")
     plt1[0].set_label(f"city {city['city_number']}")
+
+print(history)
 plt.legend()
 plt.show()

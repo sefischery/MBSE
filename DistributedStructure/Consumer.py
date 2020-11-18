@@ -5,7 +5,6 @@ import random
 from DistributedStructure.SolarCell import SolarCell
 from constants import *
 
-DAILY_USAGE = 4488  # Watt
 
 RegularConsumerHourly = [0.03303964757709271, 0.022026431718061677, 0.02026431718061674, 0.022026431718061675,
                          0.02026431718061674, 0.03436123348017621, 0.04229074889867841, 0.04317180616740088,
@@ -24,14 +23,7 @@ listOfConsumers_dict = {
     "HighUsageConsumer": HighUsageConsumerHourly
 }
 
-batteryEnergyEfficiency = 0.75 # 25 % Loss
-
 listOfConsumers = [RegularConsumerHourly, NightConsumerHourly, HomeConsumerHourly, HighUsageConsumerHourly]
-
-# The rate houses have solar cells. 0.75 = 75% solar cells
-SOLAR_CELL_RATE = 0.75
-# Defines minimum and maximum solar cell size
-SOLAR_CELL_SIZE = [15, 40]
 
 
 class Consumer(object):
@@ -45,13 +37,23 @@ class Consumer(object):
         # Dynamic variables
         self.consumedEnergyTotal = 0
         self.generatedEnergyTotal = 0
+        self.receivedEnergyTotal = 0
+        self.transmittedEnergyTotal = 0
 
         # Plots
         self.consumedEnergyHistory = []
         self.generatedEnergyHistory = []
+        self.receivedEnergyHistory = []
+        self.transmittedEnergyHistory = []
+
+        # Outages and overloads
+        self.outages = []
+        self.overloads = []
 
         self.consumedEnergyTick = 0
         self.generatedEnergyTick = 0
+        self.receivedEnergyTick = 0
+        self. transmittedEnergyTick = 0
 
         self.resource = None
 
@@ -94,16 +96,34 @@ class Consumer(object):
     def process_city_energy_grid(self, cityNumber, battery):
         energy = self.generatedEnergyTick - self.consumedEnergyTick
 
+        if type(energy) != float and type(energy) != np.float64:
+            print(f"generatedEnergyTick: {self.generatedEnergyTick}, consumedEnergyTick: {self.consumedEnergyTick}")
+            print(f"energy type: {type(energy)}, energy: {energy}")
+            exit()
+
         if energy > 0:
-            battery.put(energy * batteryEnergyEfficiency) # Give energy to city battery
+            energy = energy * BATTERY_ENERGY_EFFICIENCY
+
+            if battery.capacity - battery.level < energy:
+                # Overload of battery
+                energy = battery.capacity - battery.level
+                self.overloads.append(self.env.now)
+
+            if energy > 0:
+                battery.put(energy) # Give energy to city battery
 
         elif energy < 0:
             energy = abs(energy)
-            #if energy > battery.level: # House will experience power outage
-                #print(f"Power outage in city: {cityNumber}; house: {self.houseNumber}")
 
-            self.cityBatteryUsage += energy
-            battery.get(energy) # Take energy from city battery
+            if energy > battery.level:
+                # Outage of customer
+                energy = battery.level
+                self.outages.append(self.env.now)
+
+            if energy > 0:
+                self.cityBatteryUsage += energy
+                battery.get(energy) # Take energy from city battery
+
         yield self.env.timeout(1)
 
     def getResults(self):
@@ -112,8 +132,14 @@ class Consumer(object):
             "consumedEnergyHistory": self.consumedEnergyHistory,
             "generatedEnergyTotal": self.generatedEnergyTotal,
             "generatedEnergyHistory": self.generatedEnergyHistory,
+            "receivedEnergyTotal": self.receivedEnergyTotal,
+            "receivedEnergyHistory": self.receivedEnergyHistory,
+            "transmittedEnergyTotal": self.transmittedEnergyTotal,
+            "transmittedEnergyHistory": self.transmittedEnergyHistory,
             "cityBatteryUsage": self.cityBatteryUsage,
-            "type": self.type
+            "type": self.type,
+            "overloads": self.overloads,
+            "outages": self.outages
         }
 
 

@@ -17,16 +17,16 @@ def gather_weather_json(start_datetime, end_datetime):
     # longitude = "12.519"
     
     #Aarhus
-    # latitude = "56.157"
-    # longitude = "10.201"
+    latitude = "56.157"
+    longitude = "10.201"
 
     #Aalborg
     # latitude = "57.046"
     # longitude = "9.931"
 
     #Kolding
-    latitude = "55.491"
-    longitude = "9.474"
+    # latitude = "55.491"
+    # longitude = "9.474"
 
     #Odense
     # latitude = "55.396"
@@ -57,11 +57,11 @@ def gather_weather_json(start_datetime, end_datetime):
 
     return jsonResponse
 
-start_datetime = datetime.datetime(2018, 1, 1)
+start_datetime = datetime.datetime(2020, 1, 1)
 #dataframe = pd.read_csv("weather.csv", sep=';')
 dataframe = pd.DataFrame()
 
-for i in range(365):
+for i in range(1):
     weather = gather_weather_json(start_datetime, start_datetime + datetime.timedelta(days=1))
 
     new_data = pd.DataFrame(weather["data"])
@@ -72,7 +72,7 @@ for i in range(365):
 
 
 
-dataframe.to_csv('weather/data/2018/weather_kolding.csv', sep=';')
+dataframe.to_csv('weather/data/temp_aarhus.csv', sep=';')
 
 
 
