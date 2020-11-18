@@ -173,7 +173,7 @@ class EnergyGrid(object):
                 for city in criticalCities:  # Start with the critical cities
                     neededEnergy = ((city.battery.capacity * 0.30) - city.battery.level)  # The energy the city needs
                     if self.resourceGeneratedEnergy > neededEnergy:  # If there is enough generated energy to support the battery
-                        city.process_incoming_energy(neededEnergy)
+                        city.process_incoming_energy(neededEnergy * WIND_TURBINE_TRANSMISSION_EFFICIENCY)
                         #print(f"Wind turbine sending {neededEnergy} to critical city {city.cityNumber}")
                         self.resourceGeneratedEnergy -= neededEnergy
                         #print(f"Reamining resource generated energy: {self.resourceGeneratedEnergy}")
