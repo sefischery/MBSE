@@ -1,18 +1,36 @@
 import datetime
-import pytz
 import random
 import simpy
 import json
 import os
 
 from DistributedStructure.City import City
-from DistributedStructure.Consumer import Consumer, select_random_consumer_type, random_solar_cell
+from DistributedStructure.Consumer import Consumer, select_random_consumer_type, \
+    random_solar_cell
 from DistributedStructure.WindTurbine import WindTurbine
 
 from constants import *
 
-
 WindTurbineEnergyGeneration = []
+
+
+def is_critical_city(city_):
+    return True if city_.battery.level / city_.battery.capacity < CRITICAL_CITY_PERCENTAGE else False
+
+
+def is_supportive_city(city_):
+    return True if city_.battery.level / city_.battery.capacity > SUPPORTIVE_CITY_PERCENTAGE else False
+
+
+def find_critical_and_supportive_cities(city_list):
+    criticalCities = []
+    supportiveCities = []
+    for city_ in city_list:
+        if is_critical_city(city_):
+            criticalCities.append(city_)
+        elif is_supportive_city(city_):
+            supportiveCities.append(city_)
+    return criticalCities, supportiveCities
 
 
 class EnergyGrid(object):
@@ -43,15 +61,11 @@ class EnergyGrid(object):
 
     def overwatch_cities(self):
         while True:
-            criticalCities = []
-            supportiveCities = []
-            for city in self.cities:
-                if city.battery.level / city.battery.capacity < 0.25:  # less than 10 % of battery's capacity, then it's a critical city
-                    criticalCities.append(city)  # Critical cities
-                elif city.battery.level / city.battery.capacity > 0.50:  # if city has 20% or more of battery's capacity then it's a supportivecity.
-                    supportiveCities.append(city)  # Balanced city energy level
+            criticalCities, supportiveCities = find_critical_and_supportive_cities(self.cities)
             if len(criticalCities) > 0 and len(supportiveCities) > 0:
-                env.process(self.perform_city_energy_distribution(criticalCities, supportiveCities))
+                env.process(
+                    self.perform_city_energy_distribution(criticalCities,
+                                                          supportiveCities))
 
             # In case we still have critical cities, distribute energy from resource battery
             self.distribute_to_critical_city_from_resource_battery()
@@ -60,8 +74,9 @@ class EnergyGrid(object):
 
     def distribute_to_critical_city_from_resource_battery(self):
         for city in self.cities:
-            if city.battery.level / city.battery.capacity < 0.25:  # less than 10 % of battery's capacity, then it's a critical city
-                neededEnergy = ((city.battery.capacity * 0.30) - city.battery.level)
+            if is_critical_city(city):
+                neededEnergy = (
+                        (city.battery.capacity * 0.30) - city.battery.level)
                 if self.resourceBattery.level > neededEnergy:
                     city.battery.put(neededEnergy)
                     self.resourceBattery.get(neededEnergy)
@@ -72,7 +87,8 @@ class EnergyGrid(object):
 
     def overwatch_resource_battery(self):
         while True:
-            current_resource_battery_procentage_level = (self.resourceBattery.level / self.resourceBattery.capacity) * 100
+            current_resource_battery_procentage_level = \
+                (self.resourceBattery.level / self.resourceBattery.capacity) * 100
             difficultyRating = 100
             for resource in self.resources:
                 if resource.online:
@@ -115,15 +131,15 @@ class EnergyGrid(object):
                         if surPlusEnergy < neededEnergy:
                             neededEnergy -= surPlusEnergy
                             supportiveCity.battery.get(surPlusEnergy)
-                            criticalCity.battery.put(surPlusEnergy)
+                            criticalCity.battery.put(surPlusEnergy * INTER_CITY_TRANSMISSION_EFFICIENCY)
                             print(
                                 f"City {supportiveCity.cityNumber}, sends energy level {surPlusEnergy}, to city {criticalCity.cityNumber}")
                         else:
                             supportiveCity.battery.get(neededEnergy)
-                            criticalCity.battery.put(neededEnergy)
+                            criticalCity.battery.put(neededEnergy * INTER_CITY_TRANSMISSION_EFFICIENCY)
                             print(
                                 f"City {supportiveCity.cityNumber}, sends energy level {neededEnergy}, to city {criticalCity.cityNumber}")
-                            neededEnergy -= neededEnergy
+                            neededEnergy -= neededEnergy * INTER_CITY_TRANSMISSION_EFFICIENCY
 
         yield self.env.timeout(1)
 
@@ -146,10 +162,43 @@ class EnergyGrid(object):
     def distribute_generated_energy(self):
         while True:
             if self.resourceGeneratedEnergy > 0:
-                energyLevelToDistribute = self.resourceGeneratedEnergy / len(self.cities)
+                criticalCities = []
+                remainingCities = []
+                #print(f"Total available resource generated energy: {self.resourceGeneratedEnergy}")
                 for city in self.cities:
-                    remainingEnergy = city.process_incoming_energy(energyLevelToDistribute)
-                    self.fill_resource_battery(remainingEnergy)
+                    if is_critical_city(city):
+                        criticalCities.append(city)
+                    else:  # Rest of the cities
+                        remainingCities.append(city)
+                for city in criticalCities:  # Start with the critical cities
+                    neededEnergy = ((city.battery.capacity * 0.30) - city.battery.level)  # The energy the city needs
+                    if self.resourceGeneratedEnergy > neededEnergy:  # If there is enough generated energy to support the battery
+                        city.process_incoming_energy(neededEnergy * WIND_TURBINE_TRANSMISSION_EFFICIENCY)
+                        #print(f"Wind turbine sending {neededEnergy} to critical city {city.cityNumber}")
+                        self.resourceGeneratedEnergy -= neededEnergy
+                        #print(f"Reamining resource generated energy: {self.resourceGeneratedEnergy}")
+                    else:  # Send alle the remaining energy to that city
+                        city.process_incoming_energy(self.resourceGeneratedEnergy * WIND_TURBINE_TRANSMISSION_EFFICIENCY)
+                        #print(f"Wind turbine sending {self.resourceGeneratedEnergy} to critical city {city.cityNumber}")
+                        self.resourceGeneratedEnergy = 0
+                        #print(f"Reamining resource generated energy: {self.resourceGeneratedEnergy}")
+                        break
+
+                for city in remainingCities:  # Continue with the remaining cities
+                    neededEnergy = city.battery.capacity - city.battery.level
+                    if self.resourceGeneratedEnergy > neededEnergy:  # If there is enough generated energy to support the battery
+                        city.process_incoming_energy(neededEnergy * WIND_TURBINE_TRANSMISSION_EFFICIENCY)
+                        #print(f"Wind turbine sending {neededEnergy} to city {city.cityNumber}")
+                        self.resourceGeneratedEnergy -= neededEnergy
+                        #print(f"Reamining resource generated energy: {self.resourceGeneratedEnergy}")
+                    else:  # Send alle the remaining energy to that city
+                        city.process_incoming_energy(self.resourceGeneratedEnergy * WIND_TURBINE_TRANSMISSION_EFFICIENCY)
+                        #print(f"Wind turbine sending {self.resourceGeneratedEnergy} to city {city.cityNumber}")
+                        self.resourceGeneratedEnergy = 0
+                        #print(f"Reamining resource generated energy: {self.resourceGeneratedEnergy}")
+                        break
+
+                self.fill_resource_battery(self.resourceGeneratedEnergy)
             yield self.env.timeout(1)
 
     def fill_resource_battery(self, energy):
@@ -159,13 +208,11 @@ class EnergyGrid(object):
                 if energy > batteryCapacityDifferenceFromBatteryLevel:
                     initialEnergy = energy
                     energy = batteryCapacityDifferenceFromBatteryLevel
-                    print(f"Windturbines store: {energy}, energy wasted: {initialEnergy-energy}")
+                    print(f"Windturbines store: {energy}, energy wasted: {initialEnergy - energy}")
 
                 self.resourceBattery.put(energy)
             else:
                 print(f"Windturbines store: {0}, energy wasted: {energy}")
-
-
 
 
 # Setup
@@ -197,7 +244,7 @@ for city in VirtualPowerGrid.cities:
         city.add_consumer(consumer)
 
     batteryCapacity = len(city.consumerList) * 10000
-    cityBatteryContainer = simpy.Container(env, batteryCapacity, init=batteryCapacity * 0.7) #0.35 * batteryCapacity)
+    cityBatteryContainer = simpy.Container(env, batteryCapacity, init=batteryCapacity * 0.7)  # 0.35 * batteryCapacity)
     city.set_battery(cityBatteryContainer)
 
 # Execute!
@@ -218,16 +265,16 @@ for city in VirtualPowerGrid.cities:
     print()
 print(f"Total windturbine energy generate: {VirtualPowerGrid.totalEnergyGenerated}")
 
-print(f"End Windturbine battery level: {VirtualPowerGrid.resourceBattery.level}, max capacity: {VirtualPowerGrid.resourceBattery.capacity}")
+print(
+    f"End Windturbine battery level: {VirtualPowerGrid.resourceBattery.level}, max capacity: {VirtualPowerGrid.resourceBattery.capacity}")
 output = json.dumps({
-    "cities": list(map(lambda x: x.getResults(),VirtualPowerGrid.cities)),
+    "cities": list(map(lambda x: x.getResults(), VirtualPowerGrid.cities)),
     "sim_time": SIM_TIME,
     "wind_turbine_generation_history": WindTurbineEnergyGeneration
 })
-#print (output)
 
-if os.path.exists("../plots/output.json"):
-    os.remove("../plots/output.json")
-f = open("../plots/output.json", "a")
+if os.path.exists("plots/output.json"):
+    os.remove("plots/output.json")
+f = open("plots/output.json", "a")
 f.write(output)
 f.close()
