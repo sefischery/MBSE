@@ -131,15 +131,15 @@ class EnergyGrid(object):
                         if surPlusEnergy < neededEnergy:
                             neededEnergy -= surPlusEnergy
                             supportiveCity.battery.get(surPlusEnergy)
-                            criticalCity.battery.put(surPlusEnergy)
+                            criticalCity.battery.put(surPlusEnergy * INTER_CITY_TRANSMISSION_EFFICIENCY)
                             print(
                                 f"City {supportiveCity.cityNumber}, sends energy level {surPlusEnergy}, to city {criticalCity.cityNumber}")
                         else:
                             supportiveCity.battery.get(neededEnergy)
-                            criticalCity.battery.put(neededEnergy)
+                            criticalCity.battery.put(neededEnergy * INTER_CITY_TRANSMISSION_EFFICIENCY)
                             print(
                                 f"City {supportiveCity.cityNumber}, sends energy level {neededEnergy}, to city {criticalCity.cityNumber}")
-                            neededEnergy -= neededEnergy
+                            neededEnergy -= neededEnergy * INTER_CITY_TRANSMISSION_EFFICIENCY
 
         yield self.env.timeout(1)
 
@@ -171,14 +171,14 @@ class EnergyGrid(object):
                     else:  # Rest of the cities
                         remainingCities.append(city)
                 for city in criticalCities:  # Start with the critical cities
-                    neededEnergy = ((city.battery.capacity * 0.30) - city.battery.level)  # The nergy the city needs
+                    neededEnergy = ((city.battery.capacity * 0.30) - city.battery.level)  # The energy the city needs
                     if self.resourceGeneratedEnergy > neededEnergy:  # If there is enough generated energy to support the battery
-                        city.process_incoming_energy(neededEnergy)
+                        city.process_incoming_energy(neededEnergy * WIND_TURBINE_TRANSMISSION_EFFICIENCY)
                         #print(f"Wind turbine sending {neededEnergy} to critical city {city.cityNumber}")
                         self.resourceGeneratedEnergy -= neededEnergy
                         #print(f"Reamining resource generated energy: {self.resourceGeneratedEnergy}")
                     else:  # Send alle the remaining energy to that city
-                        city.process_incoming_energy(self.resourceGeneratedEnergy)
+                        city.process_incoming_energy(self.resourceGeneratedEnergy * WIND_TURBINE_TRANSMISSION_EFFICIENCY)
                         #print(f"Wind turbine sending {self.resourceGeneratedEnergy} to critical city {city.cityNumber}")
                         self.resourceGeneratedEnergy = 0
                         #print(f"Reamining resource generated energy: {self.resourceGeneratedEnergy}")
@@ -187,12 +187,12 @@ class EnergyGrid(object):
                 for city in remainingCities:  # Continue with the remaining cities
                     neededEnergy = city.battery.capacity - city.battery.level
                     if self.resourceGeneratedEnergy > neededEnergy:  # If there is enough generated energy to support the battery
-                        city.process_incoming_energy(neededEnergy)
+                        city.process_incoming_energy(neededEnergy * WIND_TURBINE_TRANSMISSION_EFFICIENCY)
                         #print(f"Wind turbine sending {neededEnergy} to city {city.cityNumber}")
                         self.resourceGeneratedEnergy -= neededEnergy
                         #print(f"Reamining resource generated energy: {self.resourceGeneratedEnergy}")
                     else:  # Send alle the remaining energy to that city
-                        city.process_incoming_energy(self.resourceGeneratedEnergy)
+                        city.process_incoming_energy(self.resourceGeneratedEnergy * WIND_TURBINE_TRANSMISSION_EFFICIENCY)
                         #print(f"Wind turbine sending {self.resourceGeneratedEnergy} to city {city.cityNumber}")
                         self.resourceGeneratedEnergy = 0
                         #print(f"Reamining resource generated energy: {self.resourceGeneratedEnergy}")

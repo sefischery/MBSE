@@ -1,4 +1,4 @@
-DAYS = 364                  #                                       STATIC DON'T TOUCH
+DAYS = 365                  #                                       STATIC DON'T TOUCH
 SIM_TIME = 24 * DAYS        # Hours                                 STATIC DON'T TOUCH
 NUMB_OF_CITIES = 5          # Number of cities                      STATIC DON'T TOUCH
 NUMB_OF_WINDTURBINES = 6    # Number of windturbines in our grid.
@@ -9,7 +9,9 @@ START_HOUR = 1              #                                       STATIC DON'T
 
 WING_SIZE = [20, 80]        # Size span of wind turbines
 
-BATTERY_ENERGY_EFFICIENCY = 0.75  # STATIC DON'T TOUCH
+BATTERY_ENERGY_EFFICIENCY = 0.75                                    # STATIC DON'T TOUCH
+INTER_CITY_TRANSMISSION_EFFICIENCY = 0.94                           # 6% loss   STATIC DON'T TOUCH
+WIND_TURBINE_TRANSMISSION_EFFICIENCY = 0.94                         # 6% loss   STATIC DON'T TOUCH
 
 DAILY_USAGE = 4488          # Watt                                                      STATIC DON'T TOUCH
 SOLAR_CELL_RATE = 0.75      # The rate houses have solar cells. 0.75 = 75% solar cells  STATIC DON'T TOUCH
