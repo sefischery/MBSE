@@ -1,5 +1,4 @@
 import datetime
-import random
 import simpy
 import json
 import os

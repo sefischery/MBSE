@@ -1,6 +1,5 @@
 import datetime
 import numpy as np
-import random
 
 from DistributedStructure.SolarCell import SolarCell
 from constants import *
