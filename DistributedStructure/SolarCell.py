@@ -1,9 +1,7 @@
-import random
 from pathlib import Path
 from weather import weather_history
 from constants import *
 
-random.seed(RANDOM_SEED)
 
 base_path = Path(__file__).parent
 file_path = (base_path / "../weather/data/weather_copenhagen.csv").resolve()

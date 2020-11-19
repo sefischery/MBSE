@@ -1,3 +1,5 @@
+from random import Random
+
 DAYS = 365                  #                                       STATIC DON'T TOUCH
 SIM_TIME = 24 * DAYS        # Hours                                 STATIC DON'T TOUCH
 NUMB_OF_CITIES = 5          # Number of cities                      STATIC DON'T TOUCH
@@ -22,4 +24,5 @@ SOLAR_CELL_SIZE = [15, 40]  # Defines minimum and maximum solar cell size
 CRITICAL_CITY_PERCENTAGE = 0.25
 SUPPORTIVE_CITY_PERCENTAGE = 0.50
 
-RANDOM_SEED = 123                                                   # STATIC DON'T TOUCH
+random = Random()                                                   # STATIC DON'T TOUCH
+random.seed(123)                                                    # STATIC DON'T TOUCH
