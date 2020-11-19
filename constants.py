@@ -9,6 +9,8 @@ START_HOUR = 1              #                                       STATIC DON'T
 
 WING_SIZE = [20, 80]        # Size span of wind turbines
 
+WIND_TURBINE_LIFESPAN_HOURS = 120000
+
 BATTERY_ENERGY_EFFICIENCY = 0.75                                    # STATIC DON'T TOUCH
 INTER_CITY_TRANSMISSION_EFFICIENCY = 0.94                           # 6% loss   STATIC DON'T TOUCH
 WIND_TURBINE_TRANSMISSION_EFFICIENCY = 0.94                         # 6% loss   STATIC DON'T TOUCH
