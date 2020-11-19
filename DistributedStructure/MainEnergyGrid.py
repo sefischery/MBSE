@@ -11,6 +11,8 @@ from DistributedStructure.WindTurbine import WindTurbine
 
 from constants import *
 
+random.seed(RANDOM_SEED)
+
 WindTurbineEnergyGeneration = []
 
 
@@ -214,6 +216,7 @@ class EnergyGrid(object):
             else:
                 print(f"Windturbines store: {0}, energy wasted: {energy}")
 
+random.seed(RANDOM_SEED)
 
 # Setup
 env = simpy.Environment()

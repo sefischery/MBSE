@@ -5,6 +5,7 @@ import random
 from DistributedStructure.SolarCell import SolarCell
 from constants import *
 
+random.seed(RANDOM_SEED)
 
 RegularConsumerHourly = [0.03303964757709271, 0.022026431718061677, 0.02026431718061674, 0.022026431718061675,
                          0.02026431718061674, 0.03436123348017621, 0.04229074889867841, 0.04317180616740088,
