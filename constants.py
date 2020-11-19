@@ -1,4 +1,4 @@
-DAYS = 10                  #                                       STATIC DON'T TOUCH
+DAYS = 365                  #                                       STATIC DON'T TOUCH
 SIM_TIME = 24 * DAYS        # Hours                                 STATIC DON'T TOUCH
 NUMB_OF_CITIES = 5          # Number of cities                      STATIC DON'T TOUCH
 NUMB_OF_WINDTURBINES = 6    # Number of windturbines in our grid.
