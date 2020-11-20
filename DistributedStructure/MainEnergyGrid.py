@@ -230,7 +230,7 @@ for i in range(NUMB_OF_WINDTURBINES):
 
 
 # Initialize Cities
-Cities = [City(env, i, CITIES[i]) for i in range(len(CITIES))]
+Cities = [City(env, i, CITIES[i % NUMB_OF_CITIES]) for i in range(len(CITIES))]
 
 # Sets for Virtual Power Plant Grid
 VirtualPowerGrid.set_cities(Cities)
