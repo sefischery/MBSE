@@ -224,13 +224,13 @@ VirtualPowerGrid = EnergyGrid(env)
 Windturbines = []
 for i in range(NUMB_OF_WINDTURBINES):
     wing_size = random.randint(*WING_SIZE)
-    city_weather = CITIES[i % NUMB_OF_CITIES]
+    city_weather = CITIES[i % len(CITIES)]
     wt = WindTurbine(wing_size, city_weather)
     Windturbines.append(wt)
 
 
 # Initialize Cities
-Cities = [City(env, i, CITIES[i % NUMB_OF_CITIES]) for i in range(len(CITIES))]
+Cities = [City(env, i, CITIES[i % len(CITIES)]) for i in range(NUMB_OF_CITIES)]
 
 # Sets for Virtual Power Plant Grid
 VirtualPowerGrid.set_cities(Cities)
