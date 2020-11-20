@@ -4,11 +4,11 @@ import numpy as np
 import constants
 
 base_path = Path(__file__).parent
-file_path = (base_path / "../weather/data/weather_copenhagen.csv").resolve()
 
 
 class WindTurbine(object):
-    def __init__(self, wing_size):
+    def __init__(self, wing_size, weather_path):
+        file_path = (base_path / weather_path).resolve()
         self.A = pow(wing_size, 2) * np.pi
         self.log = weather_history.WeatherLog(file_path)
         self.online = True

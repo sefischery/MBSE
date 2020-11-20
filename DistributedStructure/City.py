@@ -2,10 +2,11 @@ from constants import *
 
 
 class City(object):
-    def __init__(self, env, cityNumber):
+    def __init__(self, env, cityNumber, weather_path):
         # Input parameter initialized
         self.env = env
         self.cityNumber = cityNumber
+        self.weather_path = weather_path
         # plot variable
         self.city_battery_level_history = []
         # Dynamic

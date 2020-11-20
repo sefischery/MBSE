@@ -221,10 +221,16 @@ env = simpy.Environment()
 VirtualPowerGrid = EnergyGrid(env)
 
 # Initialize windtubines
-Windturbines = [WindTurbine(random.randint(*WING_SIZE)) for _ in range(NUMB_OF_WINDTURBINES)]
+Windturbines = []
+for i in range(NUMB_OF_WINDTURBINES):
+    wing_size = random.randint(*WING_SIZE)
+    city_weather = CITIES[i % len(CITIES)]
+    wt = WindTurbine(wing_size, city_weather)
+    Windturbines.append(wt)
+
 
 # Initialize Cities
-Cities = [City(env, i) for i in range(NUMB_OF_CITIES)]
+Cities = [City(env, i, CITIES[i % len(CITIES)]) for i in range(NUMB_OF_CITIES)]
 
 # Sets for Virtual Power Plant Grid
 VirtualPowerGrid.set_cities(Cities)
@@ -237,9 +243,9 @@ VirtualPowerGrid.set_battery(windturbineBatteryContainer)
 
 # Add Consumers & Battery to Cities
 for city in VirtualPowerGrid.cities:
-    consumers = [Consumer(env, select_random_consumer_type(), i) for i in range(random.randint(10, 20))]
+    consumers = [Consumer(env, select_random_consumer_type(), i, city.weather_path) for i in range(random.randint(10, 20))]
     for consumer in consumers:
-        consumer.set_resource(random_solar_cell())  # Set generation resource
+        consumer.set_resource(random_solar_cell(city.weather_path))  # Set generation resource
         city.add_consumer(consumer)
 
     batteryCapacity = len(city.consumerList) * 10000
