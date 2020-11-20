@@ -2,7 +2,9 @@ from random import Random
 
 DAYS = 365                  #                                       STATIC DON'T TOUCH
 SIM_TIME = 24 * DAYS        # Hours                                 STATIC DON'T TOUCH
-NUMB_OF_CITIES = 5          # Number of cities                      STATIC DON'T TOUCH
+CITIES = ["../weather/data/weather_copenhagen.csv", "../weather/data/weather_kolding.csv", "../weather/data/weather_odense.csv", "../weather/data/weather_aalborg.csv", "../weather/data/weather_aarhus.csv"]
+NUMB_OF_CITIES = len(CITIES) #                                      STATIC DON'T TOUCH
+
 NUMB_OF_WINDTURBINES = 6    # Number of windturbines in our grid.
 START_YEAR = 2019           #                                       STATIC DON'T TOUCH
 START_MONTH = 1             #                                       STATIC DON'T TOUCH
