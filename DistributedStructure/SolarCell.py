@@ -4,7 +4,6 @@ from constants import *
 
 
 base_path = Path(__file__).parent
-# file_path = (base_path / "../weather/data/weather_copenhagen.csv").resolve()
 
 # SOLAR CELL
 class SolarCell(object):
