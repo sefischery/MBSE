@@ -48,9 +48,9 @@ for consumer, wind in zip(consumer_per_day, wind_per_day):
 sim_days = len(consumer_share)
 
 plt.figure(figsize=(20, 10))
-# Draw windturbine energy generation
-plt.plot(np.arange(0, sim_days), consumer_share, color='tab:red', label='Wind Turbine')
+
+plt.plot(np.arange(0, sim_days), consumer_share, color='tab:red', label='Consumers')
 plt.xlabel("Day of year")
-plt.ylabel("Windturbine Energy Generation")
+plt.ylabel("Share of total power generation")
 plt.legend()
 plt.show()
