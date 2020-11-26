@@ -12,9 +12,6 @@ from constants import *
 
 WindTurbineEnergyGeneration = []
 
-SolarPanelEnergyGeneration = []
-
-
 def is_critical_city(city_):
     return True if city_.battery.level / city_.battery.capacity < CRITICAL_CITY_PERCENTAGE else False
 
