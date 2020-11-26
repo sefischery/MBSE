@@ -12,6 +12,8 @@ from constants import *
 
 WindTurbineEnergyGeneration = []
 
+SolarPanelEnergyGeneration = []
+
 
 def is_critical_city(city_):
     return True if city_.battery.level / city_.battery.capacity < CRITICAL_CITY_PERCENTAGE else False
@@ -270,12 +272,23 @@ for city in VirtualPowerGrid.cities:
     print()
 print(f"Total windturbine energy generate: {VirtualPowerGrid.totalEnergyGenerated}")
 
+cityGeneration = []
+for hour in range(SIM_TIME):
+    generation = 0
+    for city in Cities:
+        for consumer in city.consumerList:
+            if consumer.generatedEnergyHistory != []:
+                generation += consumer.generatedEnergyHistory[hour][1]
+    cityGeneration.append(generation)
+            
+
 print(
     f"End Windturbine battery level: {VirtualPowerGrid.resourceBattery.level}, max capacity: {VirtualPowerGrid.resourceBattery.capacity}")
 output = json.dumps({
     "cities": list(map(lambda x: x.getResults(), VirtualPowerGrid.cities)),
     "sim_time": SIM_TIME,
-    "wind_turbine_generation_history": WindTurbineEnergyGeneration
+    "wind_turbine_generation_history": WindTurbineEnergyGeneration,
+    "consumer_generation_history": cityGeneration
 })
 
 if os.path.exists("plots/output.json"):
