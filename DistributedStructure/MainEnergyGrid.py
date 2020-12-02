@@ -11,6 +11,8 @@ from DistributedStructure.WindTurbine import WindTurbine
 from constants import *
 
 WindTurbineEnergyGeneration = []
+WindTurbinesOnline = []
+ResourceBatteryPercentage = []
 
 def is_critical_city(city_):
     return True if city_.battery.level / city_.battery.capacity < CRITICAL_CITY_PERCENTAGE else False
@@ -67,6 +69,7 @@ class EnergyGrid(object):
 
             # In case we still have critical cities, distribute energy from resource battery
             self.distribute_to_critical_city_from_resource_battery()
+            ResourceBatteryPercentage.append(self.resourceBattery.level)
 
             yield self.env.timeout(1)
 
@@ -146,13 +149,16 @@ class EnergyGrid(object):
 
         while True:
             self.resourceGeneratedEnergy = 0
+            no_online = 0
 
             for resource in self.resources:
                 if resource.online:
                     self.resourceGeneratedEnergy += resource.power(date_utc)
+                    no_online += 1
 
             self.totalEnergyGenerated += self.resourceGeneratedEnergy
             WindTurbineEnergyGeneration.append(self.resourceGeneratedEnergy)
+            WindTurbinesOnline.append(no_online)
 
             date_utc += datetime.timedelta(hours=1)
             yield self.env.timeout(1)
@@ -236,8 +242,8 @@ VirtualPowerGrid.set_cities(Cities)
 VirtualPowerGrid.set_resources(Windturbines)
 
 # Add resource battery
-capatity = NUMB_OF_WINDTURBINES * 50000
-windturbineBatteryContainer = simpy.Container(env, capatity, init=capatity * 0.85)
+capatity = NUMB_OF_WINDTURBINES * WIND_TURBINE_BATTERY_CAPACITY
+windturbineBatteryContainer = simpy.Container(env, capatity, init=capatity * INITIAL_BATTERY_CHARGE_PERCENTAGE)
 VirtualPowerGrid.set_battery(windturbineBatteryContainer)
 
 # Add Consumers & Battery to Cities
@@ -247,8 +253,8 @@ for city in VirtualPowerGrid.cities:
         consumer.set_resource(random_solar_cell(city.weather_path))  # Set generation resource
         city.add_consumer(consumer)
 
-    batteryCapacity = len(city.consumerList) * 10000
-    cityBatteryContainer = simpy.Container(env, batteryCapacity, init=batteryCapacity * 0.7)  # 0.35 * batteryCapacity)
+    batteryCapacity = len(city.consumerList) * CITY_BATTERY_CAPACITY_PER_CONSUMER
+    cityBatteryContainer = simpy.Container(env, batteryCapacity, init=batteryCapacity * INITIAL_BATTERY_CHARGE_PERCENTAGE)
     city.set_battery(cityBatteryContainer)
 
 # Execute!
@@ -278,6 +284,7 @@ for hour in range(SIM_TIME):
                 generation += consumer.generatedEnergyHistory[hour][1]
     cityGeneration.append(generation)
             
+print("Total consumer energy generated " + str(sum(cityGeneration)))
 
 print(
     f"End Windturbine battery level: {VirtualPowerGrid.resourceBattery.level}, max capacity: {VirtualPowerGrid.resourceBattery.capacity}")
@@ -285,7 +292,9 @@ output = json.dumps({
     "cities": list(map(lambda x: x.getResults(), VirtualPowerGrid.cities)),
     "sim_time": SIM_TIME,
     "wind_turbine_generation_history": WindTurbineEnergyGeneration,
-    "consumer_generation_history": cityGeneration
+    "consumer_generation_history": cityGeneration,
+    "wind_turbines_online": WindTurbinesOnline,
+    "resource_battery_history": ResourceBatteryPercentage
 })
 
 if os.path.exists("plots/output.json"):
