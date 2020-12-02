@@ -20,7 +20,7 @@ INTER_CITY_TRANSMISSION_EFFICIENCY = 0.94                           # 6% loss   
 WIND_TURBINE_TRANSMISSION_EFFICIENCY = 0.94                         # 6% loss   STATIC DON'T TOUCH
 
 DAILY_USAGE = 4488          # Watt hours                              STATIC DON'T TOUCH
-SOLAR_CELL_RATE = 0.25      # The rate houses have solar cells. 0.75 = 75% solar cells  STATIC DON'T TOUCH
+SOLAR_CELL_RATE = 0.75      # The rate houses have solar cells. 0.75 = 75% solar cells  STATIC DON'T TOUCH
 SOLAR_CELL_SIZE = [15, 40]  # Defines minimum and maximum solar cell size
 
 CITY_BATTERY_CAPACITY_PER_CONSUMER = 10000
