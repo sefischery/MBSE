@@ -248,7 +248,7 @@ VirtualPowerGrid.set_battery(windturbineBatteryContainer)
 
 # Add Consumers & Battery to Cities
 for city in VirtualPowerGrid.cities:
-    consumers = [Consumer(env, select_random_consumer_type(), i, city.weather_path) for i in range(random.randint(10, 20))]
+    consumers = [Consumer(env, select_random_consumer_type(), i, city.weather_path) for i in range(random.randint(*CITY_POPULATION))]
     for consumer in consumers:
         consumer.set_resource(random_solar_cell(city.weather_path))  # Set generation resource
         city.add_consumer(consumer)
