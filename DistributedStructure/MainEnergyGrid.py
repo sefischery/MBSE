@@ -297,8 +297,8 @@ output = json.dumps({
     "resource_battery_history": ResourceBatteryPercentage
 })
 
-if os.path.exists("plots/output.json"):
-    os.remove("plots/output.json")
-f = open("plots/output.json", "a")
+if os.path.exists("../plots/output.json"):
+    os.remove("../plots/output.json")
+f = open("../plots/output.json", "a")
 f.write(output)
 f.close()
