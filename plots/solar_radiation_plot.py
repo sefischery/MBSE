@@ -12,11 +12,6 @@ base_path = Path(__file__).parent
 file_path = (base_path / "../weather/data/weather_copenhagen.csv").resolve()
 log = weather_history.WeatherLog(file_path)
 # Fetch plot data
-#januar = weather_history.utc_to_danish_time(datetime.datetime(2019, 1, 1, 0))
-#april = weather_history.utc_to_danish_time(datetime.datetime(2019, 4, 1, 0))
-#july = weather_history.utc_to_danish_time(datetime.datetime(2019, 7, 1, 0))
-#october = weather_history.utc_to_danish_time(datetime.datetime(2019, 10, 1, 0))
-
 januar = datetime.datetime(2019, 1, 1, 0)
 april = datetime.datetime(2019, 4, 1, 0)
 july = datetime.datetime(2019, 7, 1, 0)
@@ -55,8 +50,6 @@ plt.fill_between(np.arange(24), day_to_solar_rad_plot(januar), label='January')
 ax.set_xlabel('Time of day')
 ax.set_ylabel('Solar radiation [W/m²]')
 plt.xticks(np.arange(0, 25, 6), [f'{str(i).zfill(1)}:00' for i in np.arange(0, 25, 6)])
-#plt.yticks(np.arange(1000, 10000, 2000), [int(i / 1000) for i in np.arange(1000, 10000, 2000)])
-#plt.yticks(plt.yticks()[0], [int(i / 1000) for i in plt.yticks()[0]])
 plt.xlim([0, 24])
 # Plot layout
 ax.spines['top'].set_visible(False)
@@ -81,26 +74,6 @@ frame = legend.get_frame()
 frame.set_facecolor('1.0')
 frame.set_edgecolor('1.0')
 fig.tight_layout()
+
 #plt.show()
 fig.savefig('solar-radiation-non-utc.pdf')
-
-
-
-#plt.figure(figsize=(20, 10))
-
-#plt.fill_between(np.arange(24),day_to_solar_rad_plot(july), color='g')
-#plt.fill_between(np.arange(24),day_to_solar_rad_plot(april), color='b')
-#october_data = day_to_solar_rad_plot(october)
-#october_data[0] = 0.0
-#october_data[-1] = 0.0
-#plt.fill_between(np.arange(24),october_data, color='y')
-#plt.fill_between(np.arange(24),day_to_solar_rad_plot(januar), color='r')
-#plt.xlabel("Time of day")
-#plt.ylabel("Solar radiation [W/sqm]")
-#plt.xticks(np.arange(0,24, 2))
-#redLabel = pa.Patch(color='r', label='January')
-#blueLabel = pa.Patch(color='b', label='April')
-#greenLabel = pa.Patch(color='g', label='July')
-#yellowLabel = pa.Patch(color='y', label='October')
-#plt.legend(handles=[redLabel, blueLabel, greenLabel, yellowLabel])
-#plt.show()
