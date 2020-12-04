@@ -21,14 +21,22 @@ with open("../plots/output.json", "r") as f:
     VirtualPowerGrid = json.load(f)
 
 # Generate plot data
+amount_of_consumers = {}
 consumer_profiles = {}
 for city in VirtualPowerGrid['cities']:
     for consumer in city['consumers']:
+        if consumer['type'] in amount_of_consumers:
+            amount_of_consumers[consumer['type']] += 1
+        else:
+            amount_of_consumers[consumer['type']] = 0
         if consumer['type'] in consumer_profiles:
             for k, v in consumer['consumedEnergyHistory']:
                 consumer_profiles[consumer['type']][k] += v
         else:
             consumer_profiles[consumer['type']] = [b for a, b in consumer['consumedEnergyHistory']]
+# Divide sum of power with amount of each consumer type
+for k, vs in consumer_profiles.items():
+    consumer_profiles[k] = [v / amount_of_consumers[k] for v in vs]
 
 # Plot design metrics
 bmap = brewer2mpl.get_map('Set2', 'qualitative', 7)
@@ -50,12 +58,12 @@ fig = plt.figure()
 ax = fig.add_subplot(111)
 # Data
 for profile, data in consumer_profiles.items():
-    ax.plot(data[:24 + 1], alpha=1, label=convert_camel_case(profile), linewidth=2)
+    ax.plot(data, alpha=1, label=convert_camel_case(profile), linewidth=2)
 # Labels
 ax.set_xlabel('Time of day')
-ax.set_ylabel('Power [kW]')
+ax.set_ylabel('Power [W]')
 plt.xticks(np.arange(0, 25, 6), [f'{str(i).zfill(1)}:00' for i in np.arange(0, 25, 6)])
-plt.yticks(np.arange(1000, 10000, 2000), [int(i / 1000) for i in np.arange(1000, 10000, 2000)])
+#plt.yticks(np.arange(1000, 10000, 2000), [int(i / 1000) for i in np.arange(1000, 10000, 2000)])
 #plt.yticks(plt.yticks()[0], [int(i / 1000) for i in plt.yticks()[0]])
 plt.xlim([0, 24])
 # Plot layout

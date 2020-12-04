@@ -1,34 +1,18 @@
 from matplotlib import pyplot as plt
 import matplotlib as mpl
-import seaborn as sns
 import numpy as np
 import json
+import brewer2mpl
 
-# Meta data
-with open("plots/output.json", "r") as f:
+# Load data
+with open("../plots/output.json", "r") as f:
     VirtualPowerGrid = json.load(f)
-
-# Colors (to match DTU color palette)
-colors = ['#2F3EEA',  # Navy blue
-          '#030F4F',  # Blue
-          '#79238E',  # Purple
-          '#E83F48',  # Red
-          '#FC7634',  # Orange
-          '#F7BBB1',  # Pink
-          '#F6D04D',  # Yellow
-          '#1FD082',  # Bright Green
-          '#008835',  # Green
-          '#DADADA']  # Grey
-
-mpl.rcParams['axes.prop_cycle'] = mpl.cycler(color=colors)
-
+# Generate plot data
 sim_time = VirtualPowerGrid["sim_time"]
 cities = VirtualPowerGrid["cities"]
 resource_battery_history = VirtualPowerGrid["resource_battery_history"]
-
 city1History = []
 city4History = []
-
 battery_charge_sum = []
 battery_charge_consumers = []
 for hour in range(sim_time):
@@ -43,31 +27,58 @@ for hour in range(sim_time):
     charge += resource_battery_history[hour]
     battery_charge_sum.append(charge)
 
-
-
 print("Minimum charge measured: " + str(min(battery_charge_sum)))
 print("Maximum charge measured: " + str(max(battery_charge_sum)))
-
 print("Difference: " + str(max(battery_charge_sum) - min(battery_charge_sum)))
 
 outages = np.zeros(sim_time)
 overloads = np.zeros(sim_time)
-
 total_cities = 0
 
-#for city in VirtualPowerGrid["cities"]:
-plt.plot(np.arange(0, sim_time), battery_charge_sum, color='tab:red', label='Total battery charge')
-plt.plot(np.arange(0, sim_time), battery_charge_consumers, color='tab:blue', label='City battery charge')
-plt.plot(np.arange(0, sim_time), resource_battery_history, color='tab:green', label='Wind turbine battery charge')
-plt.plot(np.arange(0, sim_time), city1History, color='tab:cyan', label='City 1')
-plt.plot(np.arange(0, sim_time), city4History, color='tab:purple', label='City 4')
+# Plot design metrics
+bmap = brewer2mpl.get_map('Set2', 'qualitative', 7)
+colors = bmap.mpl_colors
+params = {
+    'axes.prop_cycle': mpl.cycler(color=colors),
+    'axes.labelsize': 8,
+    'text.usetex': False,
+    'font.size': 8,
+    'font.family': 'serif',
+    'legend.fontsize': 8,
+    'xtick.labelsize': 10,
+    'ytick.labelsize': 10,
+    'figure.figsize': [3.5, 2.5]
+}
+mpl.rcParams.update(params)
+# Plot
+fig = plt.figure()
+ax = fig.add_subplot(111)
+# Data
+plt.plot(np.arange(0, sim_time), battery_charge_sum, label='Total battery charge')
+#plt.plot(np.arange(0, sim_time), battery_charge_consumers, label='City battery charge')
+#plt.plot(np.arange(0, sim_time), resource_battery_history, label='Wind turbine battery charge')
+#plt.plot(np.arange(0, sim_time), city1History, label='City 1')
+#plt.plot(np.arange(0, sim_time), city4History, label='City 4')
+# Labels
+ax.set_xlabel('Time of year [hour]')
+ax.set_ylabel('Power stored [Wh]')
+#plt.xticks(np.arange(15 * 24, 364 * 24, 30 * 24), (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12))
+# Plot layout
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.spines['left'].set_visible(False)
+ax.get_xaxis().tick_bottom()
+ax.get_yaxis().tick_left()
+ax.tick_params(axis='x', direction='out')
+ax.tick_params(axis='y', length=0)
+# Offset the spines
+for spine in ax.spines.values():
+    spine.set_position(('outward', 5))
+# Put the grid behind
+ax.grid(axis='y', color="0.9", linestyle='-', linewidth=1)
+ax.set_axisbelow(True)
+fig.tight_layout()
 
-
-plt.xlabel("Time of year [hour]")
-plt.ylabel("Energy stored [Wh]")
-
-sns.set_theme()
-sns.set(font_scale=2)
-
-plt.legend(loc = 2, prop = {'size': 10})
 plt.show()
+fig.savefig('output/battery.pdf')
+
