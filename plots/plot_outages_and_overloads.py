@@ -32,30 +32,18 @@ outages_monthly = compute_monthly_data(outages)
 overloads_monthly = compute_monthly_data(overloads)
 
 # Plot design metrics
-#colors = ['#2F3EEA',  # Navy blue
-#          '#030F4F',  # Blue
-#          '#79238E',  # Purple
-#          '#E83F48',  # Red
-#          '#FC7634',  # Orange
-#          '#F7BBB1',  # Pink
-#          '#F6D04D',  # Yellow
-#          '#1FD082',  # Bright Green
-#          '#008835',  # Green
-#          '#DADADA']  # Grey
-
 bmap = brewer2mpl.get_map('Set2', 'qualitative', 7)
 colors = bmap.mpl_colors
-
 params = {
     'axes.prop_cycle': mpl.cycler(color=colors),
     'axes.labelsize': 8,
+    'text.usetex': False,
     'font.size': 8,
     'font.family': 'serif',
     'legend.fontsize': 10,
     'xtick.labelsize': 10,
     'ytick.labelsize': 10,
-    'text.usetex': False,
-    'figure.figsize': [4, 3]
+    'figure.figsize': [3.5, 2.5]
 }
 mpl.rcParams.update(params)
 
@@ -72,8 +60,8 @@ ax.bar(index, overloads_monthly, bar_width, alpha=opacity, label='Overloads')
 ax.bar(index + bar_width, outages_monthly, bar_width, alpha=opacity, label='Outages')
 # Labels
 ax.set_xlabel('Month')
-ax.set_ylabel('Number of failures')
-plt.xticks(index, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+ax.set_ylabel('Number of overloads/outages')
+plt.xticks(index + bar_width / 2, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
 # Plot layout
 ax.spines['top'].set_visible(False)
 ax.spines['right'].set_visible(False)
@@ -94,6 +82,6 @@ frame = legend.get_frame()
 frame.set_facecolor('1.0')
 frame.set_edgecolor('1.0')
 
-#plt.show()
 fig.tight_layout()
+#plt.show()
 fig.savefig('high-power.pdf')
