@@ -5,7 +5,7 @@ import json
 import brewer2mpl
 
 # Load data
-with open("../plots/output.json", "r") as f:
+with open("plots/output.json", "r") as f:
     VirtualPowerGrid = json.load(f)
 # Generate plot data
 sim_time = VirtualPowerGrid["sim_time"]
@@ -53,15 +53,22 @@ mpl.rcParams.update(params)
 # Plot
 fig = plt.figure()
 ax = fig.add_subplot(111)
+
+battery_charge_sum = np.divide(battery_charge_sum, 1000000)
+battery_charge_consumers = np.divide(battery_charge_consumers, 1000000)
+resource_battery_history = np.divide(resource_battery_history, 1000000)
+city1History = np.divide(city1History, 1000000)
+city4History = np.divide(city4History, 1000000)
+
 # Data
 plt.plot(np.arange(0, sim_time), battery_charge_sum, label='Total battery charge')
-#plt.plot(np.arange(0, sim_time), battery_charge_consumers, label='City battery charge')
-#plt.plot(np.arange(0, sim_time), resource_battery_history, label='Wind turbine battery charge')
-#plt.plot(np.arange(0, sim_time), city1History, label='City 1')
-#plt.plot(np.arange(0, sim_time), city4History, label='City 4')
+plt.plot(np.arange(0, sim_time), battery_charge_consumers, label='City battery charge')
+plt.plot(np.arange(0, sim_time), resource_battery_history, label='Wind turbine battery charge')
+plt.plot(np.arange(0, sim_time), city1History, label='City 1')
+plt.plot(np.arange(0, sim_time), city4History, label='City 4')
 # Labels
 ax.set_xlabel('Time of year [hour]')
-ax.set_ylabel('Power stored [Wh]')
+ax.set_ylabel('Power stored [MWh]')
 #plt.xticks(np.arange(15 * 24, 364 * 24, 30 * 24), (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12))
 # Plot layout
 ax.spines['top'].set_visible(False)
@@ -79,6 +86,8 @@ ax.grid(axis='y', color="0.9", linestyle='-', linewidth=1)
 ax.set_axisbelow(True)
 fig.tight_layout()
 
-plt.show()
-fig.savefig('output/battery.pdf')
+plt.legend(loc = 2, prop = {'size': 6})
+
+# plt.show()
+fig.savefig('output/Approximate-Battery.pdf')
 
