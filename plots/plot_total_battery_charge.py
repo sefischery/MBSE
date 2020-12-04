@@ -80,5 +80,5 @@ ax.set_axisbelow(True)
 fig.tight_layout()
 
 plt.show()
-#fig.savefig('output/battery.pdf')
+fig.savefig('output/battery.pdf')
 
