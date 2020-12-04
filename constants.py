@@ -13,7 +13,7 @@ START_HOUR = 1              #                                       STATIC DON'T
 
 WING_SIZE = [20, 80]        # Size span of wind turbines
 
-CITY_POPULATION = [15, 15]
+CITY_POPULATION = [10, 20]
 
 WIND_TURBINE_LIFESPAN_HOURS = 120000
 
