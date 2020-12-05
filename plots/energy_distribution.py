@@ -25,8 +25,10 @@ ax = fig.add_subplot(111)
 # Data
 plt.axhline(y=50, color='0.4', linestyle=':')
 plt.axhline(y=20, color='0.4', linestyle=':')
-ax.plot([40, 50, 55, 55, 50, 35, 20, 10, 10, 20, 25, 30, 30], label='City 1', linewidth=2)
-ax.plot([30, 20, 15, 15, 20, 35, 50, 60, 60, 50, 45, 40, 40], label='City 2', linewidth=2)
+ax.plot([40, 50, 55, 55, 50, 45, 20, 10, 10, 20, 25, 30, 30], label='City 1', linewidth=2)
+ax.plot([30, 20, 15, 15, 20, 25, 50, 60, 60, 50, 45, 40, 40], label='City 2', linewidth=2)
+ax.plot([1, 4, 6, 10], [50, 50, 20, 25], 'x', color='0.4')
+ax.plot([1, 5, 6, 9], [20, 25, 50, 50], 'x', color='0.4')
 # Labels
 ax.set_xlabel('Time')
 ax.set_ylabel('Battery levels')
