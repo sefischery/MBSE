@@ -10,6 +10,8 @@ Source code for the final project (exam project) for course 02223 Model-Based Sy
 - Sebastian Fischer, s164158
 
 ## Requirements
+Ensure Python3 is installed.
+
 Install dependencies in _requirements.txt_ by executing command:
 >pip3 install -r requirements.txt
 
