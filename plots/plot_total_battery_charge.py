@@ -5,7 +5,7 @@ import json
 import brewer2mpl
 
 # Load data
-with open('../plots/output.json', 'r') as f:
+with open('plots/output.json', 'r') as f:
     VirtualPowerGrid = json.load(f)
 # Generate plot data
 sim_time = VirtualPowerGrid['sim_time']

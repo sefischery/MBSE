@@ -5,7 +5,7 @@ import random
 import json
 
 
-with open("../plots/output.json", "r") as f:
+with open("plots/output.json", "r") as f:
     VirtualPowerGrid = json.load(f)
 
 sns.set_theme()
