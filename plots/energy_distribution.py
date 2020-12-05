@@ -1,7 +1,6 @@
 from matplotlib import pyplot as plt
 import matplotlib as mpl
 import numpy as np
-import json
 import brewer2mpl
 
 # Plot design metrics
