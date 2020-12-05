@@ -17,7 +17,7 @@ def convert_camel_case(string):
 
 
 # Load data
-with open("../plots/output.json", "r") as f:
+with open("plots/output.json", "r") as f:
     VirtualPowerGrid = json.load(f)
 
 # Generate plot data

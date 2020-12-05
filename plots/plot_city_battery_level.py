@@ -5,7 +5,7 @@ import numpy as np
 import json
 
 # Meta data
-with open("../plots/output.json", "r") as f:
+with open("plots/output.json", "r") as f:
     VirtualPowerGrid = json.load(f)
 
 # Colors (to match DTU color palette)

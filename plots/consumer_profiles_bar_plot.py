@@ -16,7 +16,7 @@ def convert_camel_case(string):
     return switcher.get(string, 'error')
 
 # Meta data
-with open("../plots/output.json", "r") as f:
+with open("plots/output.json", "r") as f:
     VirtualPowerGrid = json.load(f)
 
 # Colors (to match DTU color palette)

@@ -11,7 +11,7 @@ def compute_monthly_data(data):
 
 
 # Load JSON
-with open("../plots/output.json", "r") as f:
+with open("plots/output.json", "r") as f:
     VirtualPowerGrid = json.load(f)
 
 # Generate plot data
