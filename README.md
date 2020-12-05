@@ -9,6 +9,10 @@ Source code for the final project (exam project) for course 02223 Model-Based Sy
 - Mikkel Kaadner Leth, s153073
 - Sebastian Fischer, s164158
 
+## Requirements
+Install dependencies in _requirements.txt_ by executing command:
+>pip3 install -r requirements.txt
+
 ## How to run the code
 Constants can be changed in _constants.py_
 
