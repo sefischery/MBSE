@@ -92,4 +92,4 @@ frame.set_edgecolor('1.0')
 fig.tight_layout()
 
 # plt.show()
-fig.savefig('output/approximate-battery.pdf')
+fig.savefig('output/approximate-battery.svg')
