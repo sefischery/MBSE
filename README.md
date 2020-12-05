@@ -21,7 +21,7 @@ Install dependencies in _requirements.txt_ by executing command:
 Constants can be changed in _constants.py_
 
 Run the program using 
->python.exe -m DistributedStructure.MainEnergyGrid.py
+>python3 -m DistributedStructure.MainEnergyGrid.py
 
 Results are saved in _plots/output.json_
 
