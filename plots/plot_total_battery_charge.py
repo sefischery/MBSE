@@ -11,7 +11,7 @@ with open('../plots/output.json', 'r') as f:
 sim_time = VirtualPowerGrid['sim_time']
 cities = VirtualPowerGrid['cities']
 resource_battery_history = VirtualPowerGrid['resource_battery_history']
-city1History = []
+cit01History = []
 city4History = []
 battery_charge_sum = []
 battery_charge_consumers = []
@@ -19,8 +19,8 @@ for hour in range(sim_time):
     charge = 0
     for city in cities:
         charge += city['city_battery_level'][hour]
-        if city['city_number'] == 1:
-            city1History.append(city['city_battery_level'][hour])
+        if city['city_number'] == 0:
+            cit01History.append(city['city_battery_level'][hour])
         if city['city_number'] == 4:
             city4History.append(city['city_battery_level'][hour])
     battery_charge_consumers.append(charge)
@@ -57,14 +57,14 @@ ax = fig.add_subplot(111)
 battery_charge_sum = np.divide(battery_charge_sum, 1000000)
 battery_charge_consumers = np.divide(battery_charge_consumers, 1000000)
 resource_battery_history = np.divide(resource_battery_history, 1000000)
-city1History = np.divide(city1History, 1000000)
+cit01History = np.divide(cit01History, 1000000)
 city4History = np.divide(city4History, 1000000)
 
 # Data
 plt.plot(np.arange(0, sim_time), battery_charge_sum, label='Total battery charge')
 plt.plot(np.arange(0, sim_time), battery_charge_consumers, label='City battery charge')
 plt.plot(np.arange(0, sim_time), resource_battery_history, label='Wind turbine battery charge')
-plt.plot(np.arange(0, sim_time), city1History, label='City 1')
+plt.plot(np.arange(0, sim_time), cit01History, label='City 0')
 plt.plot(np.arange(0, sim_time), city4History, label='City 4')
 # Labels
 ax.set_xlabel('Time of year [hour]')
