@@ -16,10 +16,6 @@ Install dependencies in _requirements.txt_ by executing command:
 ## How to run the code
 Constants can be changed in _constants.py_
 
-Install dependencies
-- Python 3.8
-- SimPy
-
 Run the program using 
 >python.exe -m DistributedStructure.MainEnergyGrid.py
 
